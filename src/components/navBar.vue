@@ -38,117 +38,29 @@
     <v-spacer></v-spacer>
   </v-app-bar>
 </template>
-<script>
-// import cities from "cities.json";
-// import axios from "axios";
+<script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useWeatherStore } from "../stores/weatherStore";
 import { useNewsStore } from "../stores/NewsStore";
-// import cities from "cities.json";
 import { debounce } from "lodash";
 import { useSoccerStore } from "../stores/soccerStore";
 
-export default {
-  setup() {
-    const weatherStore = useWeatherStore();
-    const newsStore = useNewsStore();
-    const soccerStore = useSoccerStore();
-    const model = ref("");
-    onMounted(() => {
-      model.value = "Chicago";
-      weatherStore.searchCityName(model.value);
-      newsStore.searchCity(model.value);
-      soccerStore.searchSoccer();
-      soccerStore.searchWCMatches();
-    });
-    return {
-      weatherStore,
-      newsStore,
-      soccerStore,
-      model,
-    };
-  },
-  name: "navBar",
-  data: () => ({
-    descriptionLimit: 60,
-    entries: [],
-    isLoading: false,
-    search: null,
-  }),
-  methods: {
-    searchCity: debounce(function () {
-      this.weatherStore.searchCityName(this.model);
-      this.newsStore.searchCity(this.model);
-    }, 500),
-  },
-  // computed: {
-  //   // fields() {
-  //   //   if (!this.model) return [];
+const weatherStore = useWeatherStore();
+const newsStore = useNewsStore();
+const soccerStore = useSoccerStore();
+const model = ref<string>("");
 
-  //   //   return Object.keys(this.model).map((key) => {
-  //   //     return {
-  //   //       key,
-  //   //       value: this.model[key] || "n/a",
-  //   //     };
-  //   //   });
-  //   // },
-  //   items() {
-  //     return this.entries.map((entry) => {
-  //       const Description =
-  //         entry.name.length > this.descriptionLimit
-  //           ? entry.name.slice(0, this.descriptionLimit) + "..."
-  //           : entry.name;
+const searchCity = debounce(function (this: any) {
+  weatherStore.searchCityName(this.model || model.value);
+  newsStore.searchCity(this.model || model.value);
+}, 500);
 
-  //       return Object.assign({}, entry, { Description });
-  //     });
-  //   },
-  // },
-  // watch: {
-  //   model() {
-  //     const xapiKey = import.meta.env.VITE_XAPI_KEY;
-  //     axios
-  //       .get("https://api.api-ninjas.com/v1/city", {
-  //         params: {
-  //           name: this.model,
-  //         },
-  //         headers: {
-  //           "X-Api-Key": xapiKey,
-  //         },
-  //       })
-  //       .then(function (response) {
-  //         console.log(response);
-  //       })
-  //       .catch(function (error) {
-  //         console.log(error);
-  //       })
-  //       .then(function () {
-  //         // always executed
-  //       });
-  //   },
-  // },
-  // watch: {
-  //   model() {
-  //     // Items have already been loaded
-  //     if (this.items.length > 0) return;
-
-  //     // Items have already been requested
-  //     if (this.isLoading) return;
-
-  //     this.isLoading = true;
-  //     setTimeout(() => {
-  //       let z = [];
-  //       z = this.model.toLocaleLowerCase().trim();
-  //       let y = z[0].toUpperCase() + z.slice(1);
-  //       const x = _.findIndex(cities, function (o) {
-  //         return o.name == y;
-  //       });
-  //       this.entries = cities[x];
-  //       console.log(this.entries);
-  //     }, 500);
-  //     // stop loading
-  //     this.isLoading = false;
-  //   },
-  // },
-};
+onMounted(() => {
+  model.value = "Chicago";
+  weatherStore.searchCityName(model.value);
+  newsStore.searchCity(model.value);
+  soccerStore.searchSoccer();
+  soccerStore.searchWCMatches();
+});
 </script>
 <style></style>

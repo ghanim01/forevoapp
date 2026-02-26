@@ -1,6 +1,10 @@
-const axios = require("axios");
+import axios from "axios";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-module.exports = async function handler(req, res) {
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse | void> {
   const { lat, lon, units } = req.query;
 
   if (!lat || !lon) {
@@ -21,7 +25,8 @@ module.exports = async function handler(req, res) {
     );
     res.status(200).json(response.data);
   } catch (error) {
-    const status = error.response?.status || 500;
+    const axiosError = error as any;
+    const status = axiosError.response?.status || 500;
     res.status(status).json({ error: "Weather API error" });
   }
-};
+}

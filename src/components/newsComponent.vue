@@ -46,7 +46,7 @@
             <v-img
               lazy-src="../assets/imageLazy.png"
               v-ripple
-              :src="article.urlToImage"
+              :src="article.urlToImage || undefined"
               class="align-start imgSt"
               cover
               transition="slide-x-reverse-transition"
@@ -107,32 +107,25 @@
     </v-carousel> -->
   </div>
 </template>
-<script>
+<script setup lang="ts">
+import { ref, computed } from "vue";
 import { useNewsStore } from "../stores/NewsStore";
-export default {
-  setup() {
-    const newStore = useNewsStore();
-    return { newStore };
-  },
-  name: "newsComponent",
-  data: () => ({
-    newsDialog: false,
-  }),
-  computed: {
-    articles() {
-      return this.newStore.getNewsResult;
-    },
-  },
-  methods: {
-    articleTitle(x) {
-      let z = x.split("-");
-      return z[0];
-    },
-    convertDate(utc) {
-      let mDate = new Date(utc);
-      return mDate.toLocaleString();
-    },
-  },
+
+const newStore = useNewsStore();
+const newsDialog = ref<boolean>(false);
+
+const articles = computed(() => {
+  return newStore.getNewsResult;
+});
+
+const articleTitle = (x: string): string => {
+  const z = x.split("-");
+  return z[0];
+};
+
+const convertDate = (utc: string): string => {
+  const mDate = new Date(utc);
+  return mDate.toLocaleString();
 };
 </script>
 <style scoped>

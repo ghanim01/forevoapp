@@ -9,9 +9,6 @@ export default defineConfig({
       autoImport: true,
     }),
   ],
-  server: {
-    port: 3000,
-  },
   build: {
     chunkSizeWarningLimit: 20000,
     rollupOptions: {

@@ -134,50 +134,42 @@
     </v-sheet>
   </div>
 </template>
-<script>
+<script setup lang="ts">
+import { computed } from "vue";
 import { useSoccerStore } from "../stores/soccerStore";
-export default {
-  setup() {
-    const soccerStore = useSoccerStore();
-    return {
-      soccerStore,
-    };
-  },
-  name: "soccerResults",
-  data: () => ({
-    isLoading: true,
-  }),
-  computed: {
-    loading() {
-      return this.soccerStore.loading;
-    },
 
-    matches() {
-      let x = this.soccerStore.getSoccerResults.matches;
-      if (!x || !Array.isArray(x) || x.length === 0) return [];
-      let reversed = x.reverse();
-      let slicedMatches = reversed.slice(0, 20);
-      return slicedMatches;
-    },
-    competition() {
-      return this.soccerStore.getSoccerResults.competition || {};
-    },
-    WCmatches() {
-      let x = this.soccerStore.getWCResults.matches;
-      if (!x || !Array.isArray(x) || x.length === 0) return [];
-      let slicedMatches = x.slice(0, 20);
-      return slicedMatches;
-    },
-    WCcompetition() {
-      return this.soccerStore.getWCResults.competition || {};
-    },
-  },
-  methods: {
-    convertDate(utc) {
-      let mDate = new Date(utc);
-      return mDate.toLocaleString();
-    },
-  },
+const soccerStore = useSoccerStore();
+
+const loading = computed(() => {
+  return soccerStore.loading;
+});
+
+const matches = computed(() => {
+  const x = soccerStore.getSoccerResults.matches;
+  if (!x || !Array.isArray(x) || x.length === 0) return [];
+  const reversed = [...x].reverse();
+  const slicedMatches = reversed.slice(0, 20);
+  return slicedMatches;
+});
+
+const competition = computed(() => {
+  return soccerStore.getSoccerResults.competition || {};
+});
+
+const WCmatches = computed(() => {
+  const x = soccerStore.getWCResults.matches;
+  if (!x || !Array.isArray(x) || x.length === 0) return [];
+  const slicedMatches = x.slice(0, 20);
+  return slicedMatches;
+});
+
+const WCcompetition = computed(() => {
+  return soccerStore.getWCResults.competition || {};
+});
+
+const convertDate = (utc: string): string => {
+  const mDate = new Date(utc);
+  return mDate.toLocaleString();
 };
 </script>
 <style></style>

@@ -1,6 +1,10 @@
-const axios = require("axios");
+import axios from "axios";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-module.exports = async function handler(req, res) {
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<VercelResponse | void> {
   const { competition, status } = req.query;
 
   if (!competition) {
@@ -9,7 +13,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const response = await axios.get(
-      `https://api.football-data.org/v4/competitions/${competition}/matches`,
+      `https://api.football-data.org/v4/competitions/${String(competition)}/matches`,
       {
         headers: {
           "X-Auth-Token": process.env.VITE_SOCCER_TOKEN,
@@ -19,7 +23,8 @@ module.exports = async function handler(req, res) {
     );
     res.status(200).json(response.data);
   } catch (error) {
-    const errStatus = error.response?.status || 500;
+    const axiosError = error as any;
+    const errStatus = axiosError.response?.status || 500;
     res.status(errStatus).json({ error: "Soccer API error" });
   }
-};
+}

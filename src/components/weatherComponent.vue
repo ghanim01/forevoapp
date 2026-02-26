@@ -83,7 +83,7 @@
             <v-list class="transBG">
               <v-list-item density="comfortable" title="Humidity">
                 <v-list-item-subtitle>
-                  {{ Math.floor(searchRes.humidity) }}
+                  {{ Math.floor(Number(searchRes.humidity)) }}
                   %</v-list-item-subtitle
                 >
               </v-list-item>
@@ -124,78 +124,23 @@
     </v-card>
   </div>
 </template>
-<script>
+<script setup lang="ts">
+import { computed } from "vue";
 import { useWeatherStore } from "../stores/weatherStore";
 
-export default {
-  setup() {
-    const weatherStore = useWeatherStore();
-    return {
-      weatherStore,
-    };
-  },
-  name: "weatherComponent",
-  data: () => ({}),
-  computed: {
-    searchRes() {
-      return this.weatherStore.getSearchInput;
-    },
-    icon() {
-      return (
-        "http://openweathermap.org/img/wn/" +
-        this.weatherStore.getSearchInput.xicon +
-        ".png"
-      );
-    },
-  },
-  methods: {},
-};
+const weatherStore = useWeatherStore();
 
-// var icon = () => {
-//   var url =
-//     "http://openweathermap.org/img/wn/" + searchRes.value.xicon + ".png";
-//   return url;
-// };
+const searchRes = computed(() => {
+  return weatherStore.getSearchInput;
+});
 
-// onMounted(() => {
-//   search.value = "Cairo";
-//   searchCity();
-// });
-// var background = ref("");
-// switch (searchRes.value.condition) {
-//   case "Thunderstorm":
-//     background.value = "../assets/background/Thunderstorm.jpg";
-//     break;
-//   case "Drizzle":
-//     background.value = "../assets/background/Drizzle.jpg";
-//     break;
-//   case "Rain":
-//     background.value = "../assets/background/Rain.jpg";
-//     break;
-//   case "Snow":
-//     background.value = "../assets/background/Snow.jpg";
-//     break;
-//   case "Atmosphere ":
-//     background.value = "../assets/background/Atmosphere.jpg";
-//     break;
-//   case "Clear ":
-//     background.value = "../assets/background/Clear.jpg";
-//     break;
-//   case "Clouds ":
-//     background.value = "../assets/background/Clouds.jpg";
-//     break;
-//   default:
-//     background.value = "../assets/background/Snow.jpg";
-// }
-// const switchedIMG = background.value;
-// const bgVar = {
-//   backgroundImage: `url("${switchedIMG}")`,
-// };
-// console.log(bgVar.backgroundImage);
-// defineExpose({
-//   bgVar,
-//   switchedIMG,
-// });
+const icon = computed(() => {
+  return (
+    "http://openweathermap.org/img/wn/" +
+    weatherStore.getSearchInput.xicon +
+    ".png"
+  );
+});
 </script>
 <style>
 .transBG {

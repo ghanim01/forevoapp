@@ -11,22 +11,10 @@
     </v-row>
   </div>
 </template>
-<script>
+<script setup lang="ts">
 import navBar from "../components/navBar.vue";
 import weatherComponent from "../components/weatherComponent.vue";
 import newsComponent from "../components/newsComponent.vue";
 import soccerResults from "../components/soccerResults.vue";
-export default {
-  setup() {},
-  name: "HomeView",
-  components: {
-    navBar,
-    weatherComponent,
-    newsComponent,
-    soccerResults,
-  },
-  data: () => ({}),
-  methods: {},
-};
 </script>
 <style></style>
