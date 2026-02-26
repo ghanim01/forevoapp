@@ -41,7 +41,7 @@
         rel="noopener noreferrer"
         class="text-decoration-none"
       >
-        <v-row no-gutters>
+        <v-row density="comfortable">
           <v-col col="12" md="5" lg="5" class="px-5 d-flex align-center">
             <v-img
               lazy-src="../assets/imageLazy.png"

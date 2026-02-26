@@ -1,10 +1,27 @@
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 export const useSoccerStore = defineStore("soccerStore", {
   state: () => ({
-    soccerResults: ref({}),
-    worldCupResults: ref({}),
+    soccerResults: {
+      matches: [],
+      competition: {
+        id: null,
+        name: "",
+        code: "",
+        type: "",
+        emblem: "",
+      },
+    },
+    worldCupResults: {
+      matches: [],
+      competition: {
+        id: null,
+        name: "",
+        code: "",
+        type: "",
+        emblem: "",
+      },
+    },
     loading: true,
   }),
   getters: {
@@ -17,6 +34,7 @@ export const useSoccerStore = defineStore("soccerStore", {
   },
   actions: {
     async searchSoccer() {
+      this.loading = true;
       try {
         let res = await axios.get("/api/soccer", {
           params: {

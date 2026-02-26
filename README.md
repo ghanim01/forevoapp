@@ -31,7 +31,7 @@
 ## API's Used
 
 - [Football-data.org](https://www.football-data.org/)
-- [News API](https://newsapi.org/)
+- [World News API](https://worldnewsapi.com/) - Supports 210+ countries & 86+ languages
 - [OpenWeather](https://openweathermap.org/)
 - [Cities.JSON](https://github.com/lutangar/cities.json)
 
@@ -51,15 +51,28 @@
 
 #### - Set up environment variables
 
-Create a `.env.local` file in the project root with the following variables (used by Vite dev proxy and Vercel serverless functions):
+Create a `.env` file in the project root with the following variables:
 
 ```
-APP_ID=your_openweather_api_key
-NEWS_API_KEY=your_newsapi_key
-SOCCER_TOKEN=your_football_data_token
+VITE_APP_ID=your_openweather_api_key
+VITE_WORLD_NEWS_API_KEY=your_world_news_api_key
+VITE_SOCCER_TOKEN=your_football_data_token
+VITE_VERCEL_ENV=production
 ```
 
-When deploying to Vercel, add the same variables (`APP_ID`, `NEWS_API_KEY`, `SOCCER_TOKEN`) in the Vercel project settings under **Environment Variables**.
+**Get your API keys:**
+
+- OpenWeather: https://openweathermap.org/api
+- World News API: https://worldnewsapi.com/console/ (Free tier: 1,550 requests/month, supports 210+ countries)
+- Football-Data.org: https://www.football-data.org/client/register
+
+**For Vercel deployment:** Add the same environment variables (`VITE_APP_ID`, `VITE_WORLD_NEWS_API_KEY`, `VITE_SOCCER_TOKEN`, `VITE_VERCEL_ENV`) in your Vercel project settings under **Environment Variables**.
+
+#### - Install Vercel CLI globally (required for local development)
+
+```sh
+    npm install -g vercel
+```
 
 #### - Run project for development
 
@@ -67,7 +80,9 @@ When deploying to Vercel, add the same variables (`APP_ID`, `NEWS_API_KEY`, `SOC
     npm run dev
 ```
 
-> **Note:** For full local development including serverless functions, use the [Vercel CLI](https://vercel.com/docs/cli): `vercel dev`
+This runs `vercel dev` which starts the Vite dev server and the serverless API functions locally.
+
+> **Note:** The `vercel dev` command automatically proxies `/api/*` requests to your local serverless functions, so you can test the full application locally with API key security.
 
 #### - Build the project
 

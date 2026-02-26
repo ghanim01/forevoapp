@@ -17,6 +17,7 @@
           Soccer Results
         </h3>
         <v-sheet
+          v-if="competition && competition.emblem"
           theme="light"
           height="120px"
           class="d-flex flex-row m-0 pa-0 justify-center align-center text-center mx-2"
@@ -73,6 +74,7 @@
           </v-card-text>
         </v-card>
         <v-sheet
+          v-if="WCcompetition && WCcompetition.emblem"
           theme="light"
           height="120px"
           class="d-flex flex-row m-0 pa-0 justify-center align-center text-center mx-2"
@@ -152,20 +154,22 @@ export default {
 
     matches() {
       let x = this.soccerStore.getSoccerResults.matches;
+      if (!x || !Array.isArray(x) || x.length === 0) return [];
       let reversed = x.reverse();
       let slicedMatches = reversed.slice(0, 20);
       return slicedMatches;
     },
     competition() {
-      return this.soccerStore.getSoccerResults.competition;
+      return this.soccerStore.getSoccerResults.competition || {};
     },
     WCmatches() {
       let x = this.soccerStore.getWCResults.matches;
+      if (!x || !Array.isArray(x) || x.length === 0) return [];
       let slicedMatches = x.slice(0, 20);
       return slicedMatches;
     },
     WCcompetition() {
-      return this.soccerStore.getWCResults.competition;
+      return this.soccerStore.getWCResults.competition || {};
     },
   },
   methods: {

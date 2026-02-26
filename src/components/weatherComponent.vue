@@ -45,7 +45,10 @@
           </v-row>
         </v-card-text>
 
-        <v-row class="py-3 px-3 text-start justify-space-around" no-gutters>
+        <v-row
+          class="py-3 px-3 text-start justify-space-around"
+          density="comfortable"
+        >
           <v-col col="6" md="4" lg="4" align="center" class="pa-1">
             <v-list class="transBG">
               <v-list-item density="comfortable" title="Real Feel">

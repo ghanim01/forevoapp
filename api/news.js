@@ -1,23 +1,58 @@
 const axios = require("axios");
 
 module.exports = async function handler(req, res) {
-  const { country, sortBy } = req.query;
+  const { country } = req.query;
 
   if (!country) {
     return res.status(400).json({ error: "country is required" });
   }
 
   try {
-    const response = await axios.get("https://newsapi.org/v2/top-headlines", {
+    // Call World News API top-news endpoint
+    const response = await axios.get("https://api.worldnewsapi.com/top-news", {
       params: {
-        country,
-        sortBy: sortBy || "publishedAt",
-        apiKey: process.env.NEWS_API_KEY,
+        "source-country": country.toLowerCase(),
+        "api-key": process.env.VITE_WORLD_NEWS_API_KEY,
       },
     });
-    res.status(200).json(response.data);
+
+    // Transform World News API response to match NewsAPI format
+    // for compatibility with existing components
+    const articles = [];
+
+    if (response.data.top_news && Array.isArray(response.data.top_news)) {
+      response.data.top_news.forEach((cluster) => {
+        if (cluster.news && Array.isArray(cluster.news)) {
+          cluster.news.forEach((article) => {
+            articles.push({
+              source: { name: article.author || "Unknown Source" },
+              author: article.author || null,
+              title: article.title,
+              description:
+                article.summary || article.text?.substring(0, 200) || "",
+              url: article.url,
+              urlToImage: article.image || null,
+              publishedAt: article.publish_date,
+              content: article.text,
+              id: article.id,
+            });
+          });
+        }
+      });
+    }
+
+    // Return in NewsAPI-compatible format
+    res.status(200).json({
+      status: "ok",
+      totalResults: articles.length,
+      articles: articles,
+    });
   } catch (error) {
+    console.error("World News API error:", error.message);
     const status = error.response?.status || 500;
-    res.status(status).json({ error: "News API error" });
+    res.status(status).json({
+      error: "News API error",
+      message: error.message,
+    });
   }
 };

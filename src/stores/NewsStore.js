@@ -23,6 +23,10 @@ export const useNewsStore = defineStore("newsStore", {
       const x = _.findIndex(cities, function (o) {
         return o.name == y;
       });
+      if (x === -1) {
+        console.error("City not found:", city);
+        return;
+      }
       this.cityresponseResult = cities[x];
       this.searchNews();
     },
@@ -32,7 +36,6 @@ export const useNewsStore = defineStore("newsStore", {
         let response = await axios.get("/api/news", {
           params: {
             country: this.cityresponseResult.country,
-            sortBy: "publishedAt",
           },
         });
         this.newsSearchResult = response.data.articles;

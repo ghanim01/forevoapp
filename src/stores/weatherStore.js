@@ -38,6 +38,10 @@ export const useWeatherStore = defineStore("weatherStore", {
       const x = _.findIndex(cities, function (o) {
         return o.name == y;
       });
+      if (x === -1) {
+        console.error("City not found:", city);
+        return;
+      }
       this.cityresponseult = cities[x];
       this.searchresponseult.city = this.cityresponseult.name;
       this.searchWeather();

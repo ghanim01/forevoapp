@@ -12,7 +12,7 @@ module.exports = async function handler(req, res) {
       `https://api.football-data.org/v4/competitions/${competition}/matches`,
       {
         headers: {
-          "X-Auth-Token": process.env.SOCCER_TOKEN,
+          "X-Auth-Token": process.env.VITE_SOCCER_TOKEN,
         },
         params: status ? { status } : {},
       }

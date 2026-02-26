@@ -14,7 +14,7 @@ module.exports = async function handler(req, res) {
         params: {
           lat,
           lon,
-          appid: process.env.APP_ID,
+          appid: process.env.VITE_APP_ID,
           units: units || "metric",
         },
       }

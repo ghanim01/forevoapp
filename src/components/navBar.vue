@@ -55,7 +55,7 @@ export default {
     const soccerStore = useSoccerStore();
     const model = ref("");
     onMounted(() => {
-      model.value = "Cairo";
+      model.value = "Chicago";
       weatherStore.searchCityName(model.value);
       newsStore.searchCity(model.value);
       soccerStore.searchSoccer();
