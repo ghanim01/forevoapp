@@ -51,6 +51,12 @@ export default async function handler(
     return res.status(400).json({ error: "country is required" });
   }
 
+  const apiKey = process.env.VITE_WORLD_NEWS_API_KEY || process.env.WORLD_NEWS_API_KEY;
+  if (!apiKey) {
+    console.error("World News API key not configured");
+    return res.status(500).json({ error: "World News API key not configured" });
+  }
+
   try {
     // Call World News API search-news endpoint with retry logic
     const response = await fetchWithRetry(
@@ -64,7 +70,7 @@ export default async function handler(
           number: parseInt(String(number)),
         },
         headers: {
-          "x-api-key": process.env.VITE_WORLD_NEWS_API_KEY,
+          "x-api-key": apiKey,
         },
       },
       3, // max 3 retries

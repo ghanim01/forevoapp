@@ -11,12 +11,18 @@ export default async function handler(
     return res.status(400).json({ error: "competition is required" });
   }
 
+  const apiToken = process.env.VITE_SOCCER_TOKEN || process.env.SOCCER_API_TOKEN;
+  if (!apiToken) {
+    console.error("Soccer API token not configured");
+    return res.status(500).json({ error: "Soccer API token not configured" });
+  }
+
   try {
     const response = await axios.get(
       `https://api.football-data.org/v4/competitions/${String(competition)}/matches`,
       {
         headers: {
-          "X-Auth-Token": process.env.VITE_SOCCER_TOKEN,
+          "X-Auth-Token": apiToken,
         },
         params: status ? { status } : {},
       }

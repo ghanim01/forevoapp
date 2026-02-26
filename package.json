@@ -2,7 +2,7 @@
   "name": "forevoapp",
   "version": "0.0.1",
   "engines": {
-    "node": "24.x"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "vite",

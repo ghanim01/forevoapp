@@ -11,6 +11,12 @@ export default async function handler(
     return res.status(400).json({ error: "lat and lon are required" });
   }
 
+  const apiKey = process.env.VITE_APP_ID || process.env.OPENWEATHER_API_KEY;
+  if (!apiKey) {
+    console.error("Weather API key not configured");
+    return res.status(500).json({ error: "Weather API key not configured" });
+  }
+
   try {
     const response = await axios.get(
       "https://api.openweathermap.org/data/2.5/weather",
@@ -18,7 +24,7 @@ export default async function handler(
         params: {
           lat,
           lon,
-          appid: process.env.VITE_APP_ID,
+          appid: apiKey,
           units: units || "metric",
         },
       }
