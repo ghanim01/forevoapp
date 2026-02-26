@@ -1,7 +1,27 @@
-import { defineConfig } from 'vite';
-// Other configurations
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import vuetify from "vite-plugin-vuetify";
 
 export default defineConfig({
-  // Removed base: "./"
-  // Other configurations
+  plugins: [
+    vue(),
+    vuetify({
+      autoImport: true,
+    }),
+  ],
+  server: {
+    port: 3000,
+  },
+  build: {
+    chunkSizeWarningLimit: 20000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vuetify: ["vuetify"],
+          vue: ["vue", "vue-router", "pinia"],
+          vendor: ["axios", "lodash", "cities.json"],
+        },
+      },
+    },
+  },
 });
