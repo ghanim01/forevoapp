@@ -17,38 +17,31 @@ export const useSoccerStore = defineStore("soccerStore", {
   },
   actions: {
     async searchSoccer() {
-      const authToken = import.meta.env.VITE_SOCCER_TOKEN;
-      var config = {
-        method: "get",
-        url: "/api/competitions/PL/matches",
-        headers: {
-          "X-Auth-Token": authToken,
-          "Access-Control-Allow-Credentials": true,
-        },
-        params: {
-          status: "FINISHED",
-        },
-      };
-      let res = await axios(config).catch(function (error) {
-        console.log(error);
-      });
-      this.soccerResults = res.data;
+      try {
+        let res = await axios.get("/api/soccer", {
+          params: {
+            competition: "PL",
+            status: "FINISHED",
+          },
+        });
+        this.soccerResults = res.data;
+      } catch (error) {
+        console.error("Soccer API error:", error);
+      }
     },
     async searchWCMatches() {
-      const authToken = import.meta.env.VITE_SOCCER_TOKEN;
-      var config = {
-        method: "get",
-        url: "/api/competitions/CL/matches",
-        headers: {
-          "X-Auth-Token": authToken,
-          "Access-Control-Allow-Credentials": true,
-        },
-      };
-      let res = await axios(config).catch(function (error) {
-        console.log(error);
-      });
-      this.worldCupResults = res.data;
-      this.loading = false;
+      try {
+        let res = await axios.get("/api/soccer", {
+          params: {
+            competition: "CL",
+          },
+        });
+        this.worldCupResults = res.data;
+      } catch (error) {
+        console.error("Champions League API error:", error);
+      } finally {
+        this.loading = false;
+      }
     },
   },
 });

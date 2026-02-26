@@ -23,6 +23,7 @@ export const useWeatherStore = defineStore("weatherStore", {
       condition: "",
     },
     cityresponseult: ref(""),
+    isLoading: false,
   }),
   getters: {
     getSearchInput: function () {
@@ -42,39 +43,42 @@ export const useWeatherStore = defineStore("weatherStore", {
       this.searchWeather();
     },
     async searchWeather() {
-      const appID = import.meta.env.VITE_APP_ID;
-      let response = await axios.get("/weatherapi", {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-        params: {
-          lat: this.cityresponseult.lat,
-          lon: this.cityresponseult.lng,
-          appid: appID,
-          units: "metric",
-        },
-      });
-      var datetime = new Date(response.data.dt * 1000);
-      var sunrise = new Date(response.data.sys.sunrise * 1000);
-      var sunset = new Date(response.data.sys.sunset * 1000);
-      var formattedDate = datetime.toLocaleString();
-      var formattedSunrise = sunrise.toLocaleTimeString();
-      var formattedSunset = sunset.toLocaleTimeString();
-      this.searchresponseult.date = formattedDate;
-      this.searchresponseult.sunrise = formattedSunrise;
-      this.searchresponseult.sunset = formattedSunset;
-      this.searchresponseult.temp = response.data.main.temp;
-      this.searchresponseult.humidity = response.data.main.humidity;
-      this.searchresponseult.windSpeed = response.data.wind.speed;
-      this.searchresponseult.windDeg = response.data.wind.deg;
-      this.searchresponseult.clouds = response.data.clouds.all;
-      this.searchresponseult.condition = response.data.weather[0].main;
-      this.searchresponseult.xicon = response.data.weather[0].icon;
-      this.searchresponseult.description = response.data.weather[0].description;
-      this.searchresponseult.feels_like = response.data.main.feels_like;
-      this.searchresponseult.temp_max = response.data.main.temp_max;
-      this.searchresponseult.temp_min = response.data.main.temp_min;
-      this.searchresponseult.city = response.data.name;
+      this.isLoading = true;
+      try {
+        let response = await axios.get("/api/weather", {
+          params: {
+            lat: this.cityresponseult.lat,
+            lon: this.cityresponseult.lng,
+            units: "metric",
+          },
+        });
+        var datetime = new Date(response.data.dt * 1000);
+        var sunrise = new Date(response.data.sys.sunrise * 1000);
+        var sunset = new Date(response.data.sys.sunset * 1000);
+        var formattedDate = datetime.toLocaleString();
+        var formattedSunrise = sunrise.toLocaleTimeString();
+        var formattedSunset = sunset.toLocaleTimeString();
+        this.searchresponseult.date = formattedDate;
+        this.searchresponseult.sunrise = formattedSunrise;
+        this.searchresponseult.sunset = formattedSunset;
+        this.searchresponseult.temp = response.data.main.temp;
+        this.searchresponseult.humidity = response.data.main.humidity;
+        this.searchresponseult.windSpeed = response.data.wind.speed;
+        this.searchresponseult.windDeg = response.data.wind.deg;
+        this.searchresponseult.clouds = response.data.clouds.all;
+        this.searchresponseult.condition = response.data.weather[0].main;
+        this.searchresponseult.xicon = response.data.weather[0].icon;
+        this.searchresponseult.description =
+          response.data.weather[0].description;
+        this.searchresponseult.feels_like = response.data.main.feels_like;
+        this.searchresponseult.temp_max = response.data.main.temp_max;
+        this.searchresponseult.temp_min = response.data.main.temp_min;
+        this.searchresponseult.city = response.data.name;
+      } catch (error) {
+        console.error("Weather API error:", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
 });

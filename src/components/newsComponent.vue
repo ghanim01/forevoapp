@@ -13,6 +13,16 @@
         News Headlines
       </h3>
     </v-sheet>
+    <div
+      v-if="newStore.isLoading"
+      class="d-flex justify-center py-8"
+      style="width: 100%"
+    >
+      <v-progress-circular
+        indeterminate
+        color="teal-lighten-4"
+      ></v-progress-circular>
+    </div>
     <v-card
       v-for="(article, index) in articles"
       :item="article"

@@ -152,8 +152,8 @@ export default {
 
     matches() {
       let x = this.soccerStore.getSoccerResults.matches;
-      let reveresed = x.reverse();
-      let slicedMatches = reveresed.slice(0, 20);
+      let reversed = x.reverse();
+      let slicedMatches = reversed.slice(0, 20);
       return slicedMatches;
     },
     competition() {

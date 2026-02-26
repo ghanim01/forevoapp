@@ -11,23 +11,44 @@ export default defineConfig({
   server: {
     cors: true,
     proxy: {
-      "/api": {
-        target: "https://api.football-data.org/v4",
+      "/api/weather": {
+        target: "https://api.openweathermap.org",
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            const url = new URL(req.url, "http://localhost");
+            url.pathname = "/data/2.5/weather";
+            url.searchParams.set("appid", process.env.APP_ID || "");
+            proxyReq.path = url.pathname + url.search;
+          });
+        },
       },
-      "/newsapi": {
-        target: "https://newsapi.org/v2/top-headlines",
+      "/api/news": {
+        target: "https://newsapi.org",
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/newsapi/, ""),
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            const url = new URL(req.url, "http://localhost");
+            url.pathname = "/v2/top-headlines";
+            url.searchParams.set("apiKey", process.env.NEWS_API_KEY || "");
+            proxyReq.path = url.pathname + url.search;
+          });
+        },
       },
-      "/weatherapi": {
-        target: "https://api.openweathermap.org/data/2.5/weather",
+      "/api/soccer": {
+        target: "https://api.football-data.org",
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/weatherapi/, ""),
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            const url = new URL(req.url, "http://localhost");
+            const competition = url.searchParams.get("competition") || "PL";
+            const matchStatus = url.searchParams.get("status");
+            let path = `/v4/competitions/${competition}/matches`;
+            if (matchStatus) path += `?status=${matchStatus}`;
+            proxyReq.path = path;
+            proxyReq.setHeader("X-Auth-Token", process.env.SOCCER_TOKEN || "");
+          });
+        },
       },
     },
   },

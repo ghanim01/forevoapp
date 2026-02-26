@@ -22,7 +22,7 @@
 
 ## Tech Stack
 
-- [Vue.js 3](https://www.football-data.org/)
+- [Vue.js 3](https://vuejs.org/)
 - [Vuetify 3.0](https://next.vuetifyjs.com/en/)
 - [Vite](https://vitejs.dev/)
 - [Pinia](https://pinia.vuejs.org/)
@@ -30,7 +30,7 @@
 
 ## API's Used
 
-- [Football-data.org](https://vuejs.org/)
+- [Football-data.org](https://www.football-data.org/)
 - [News API](https://newsapi.org/)
 - [OpenWeather](https://openweathermap.org/)
 - [Cities.JSON](https://github.com/lutangar/cities.json)
@@ -49,11 +49,25 @@
     npm install
 ```
 
+#### - Set up environment variables
+
+Create a `.env.local` file in the project root with the following variables (used by Vite dev proxy and Vercel serverless functions):
+
+```
+APP_ID=your_openweather_api_key
+NEWS_API_KEY=your_newsapi_key
+SOCCER_TOKEN=your_football_data_token
+```
+
+When deploying to Vercel, add the same variables (`APP_ID`, `NEWS_API_KEY`, `SOCCER_TOKEN`) in the Vercel project settings under **Environment Variables**.
+
 #### - Run project for development
 
 ```sh
     npm run dev
 ```
+
+> **Note:** For full local development including serverless functions, use the [Vercel CLI](https://vercel.com/docs/cli): `vercel dev`
 
 #### - Build the project
 

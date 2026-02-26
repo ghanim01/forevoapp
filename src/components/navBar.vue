@@ -45,7 +45,7 @@ import { onMounted, ref } from "vue";
 import { useWeatherStore } from "../stores/weatherStore";
 import { useNewsStore } from "../stores/NewsStore";
 // import cities from "cities.json";
-// import _ from "lodash";
+import { debounce } from "lodash";
 import { useSoccerStore } from "../stores/soccerStore";
 
 export default {
@@ -76,10 +76,10 @@ export default {
     search: null,
   }),
   methods: {
-    searchCity() {
+    searchCity: debounce(function () {
       this.weatherStore.searchCityName(this.model);
       this.newsStore.searchCity(this.model);
-    },
+    }, 500),
   },
   // computed: {
   //   // fields() {
