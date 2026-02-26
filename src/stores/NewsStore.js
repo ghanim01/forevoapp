@@ -8,6 +8,7 @@ export const useNewsStore = defineStore("newsStore", {
   state: () => ({
     newsSearchResult: ref([]),
     cityresponseResult: ref(),
+    isLoading: false,
   }),
   getters: {
     getNewsResult: function () {
@@ -26,18 +27,20 @@ export const useNewsStore = defineStore("newsStore", {
       this.searchNews();
     },
     async searchNews() {
-      const apiKEY = import.meta.env.VITE_API_KEY;
-      let response = await axios.get("/newsapi", {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-        params: {
-          country: this.cityresponseResult.country,
-          sortBy: "publishedAt",
-          apiKey: apiKEY,
-        },
-      });
-      this.newsSearchResult = response.data.articles;
+      this.isLoading = true;
+      try {
+        let response = await axios.get("/api/news", {
+          params: {
+            country: this.cityresponseResult.country,
+            sortBy: "publishedAt",
+          },
+        });
+        this.newsSearchResult = response.data.articles;
+      } catch (error) {
+        console.error("News API error:", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
 });

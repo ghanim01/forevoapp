@@ -13,7 +13,7 @@
 </template>
 <script>
 import navBar from "../components/navBar.vue";
-import weatherComponent from "../components/weatherCompnent.vue";
+import weatherComponent from "../components/weatherComponent.vue";
 import newsComponent from "../components/newsComponent.vue";
 import soccerResults from "../components/soccerResults.vue";
 export default {
