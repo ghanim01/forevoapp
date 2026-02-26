@@ -25,7 +25,7 @@ async function fetchWithRetry(
       return response;
     } catch (error: any) {
       lastError = error;
-      console.log(`News API attempt ${attempt + 1} failed: ${error.message}`);
+      console.log(`GNews API attempt ${attempt + 1} failed: ${error.message}`);
       if (attempt < maxRetries - 1) {
         const delay = baseDelay * Math.pow(2, attempt); // exponential backoff
         await new Promise((resolve) => setTimeout(resolve, delay));
@@ -39,54 +39,72 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<VercelResponse | void> {
-  const { country, language = "en", offset = 0, number = 10 } = req.query;
+  const { q, country, language = "en", max = 10, category = "general" } = req.query;
 
-  const getYesterdayDateFormatted = (): string => {
-    const date = new Date();
-    date.setDate(date.getDate() - 1);
-    return date.toISOString().split("T")[0];
-  };
-
-  if (!country) {
-    return res.status(400).json({ error: "country is required" });
-  }
-
-  const apiKey = process.env.VITE_WORLD_NEWS_API_KEY || process.env.WORLD_NEWS_API_KEY;
+  const apiKey = process.env.VITE_GNEWS_API_KEY || process.env.GNEWS_API_KEY;
   if (!apiKey) {
-    console.error("World News API key not configured");
-    return res.status(500).json({ error: "World News API key not configured" });
+    console.error("GNews API key not configured");
+    return res.status(500).json({ error: "GNews API key not configured" });
   }
 
   try {
-    // Call World News API search-news endpoint with retry logic
-    const response = await fetchWithRetry(
-      "https://api.worldnewsapi.com/search-news",
-      {
-        params: {
-          "source-country": String(country).toLowerCase(),
-          language: String(language).toLowerCase(),
-          date: getYesterdayDateFormatted(),
-          offset: parseInt(String(offset)),
-          number: parseInt(String(number)),
-        },
-        headers: {
-          "x-api-key": apiKey,
-        },
-      },
-      3, // max 3 retries
-      2000 // start with 2 second delay
-    );
+    let url: string;
+    let params: Record<string, string | number>;
 
-    // Return World News API response format directly
+    if (q) {
+      // Search endpoint – keyword-based query (supports boolean operators)
+      // Docs: https://docs.gnews.io/endpoints/search-endpoint
+      url = "https://gnews.io/api/v4/search";
+      params = {
+        q: String(q),
+        lang: String(language).toLowerCase(),
+        max: Math.min(parseInt(String(max)), 10),
+        sortby: "publishedAt",
+        apikey: apiKey,
+      };
+    } else if (country) {
+      // Top-headlines endpoint – country-specific trending articles
+      // Docs: https://docs.gnews.io/endpoints/top-headlines-endpoint
+      url = "https://gnews.io/api/v4/top-headlines";
+      params = {
+        category: String(category),
+        lang: String(language).toLowerCase(),
+        country: String(country).toLowerCase(),
+        max: Math.min(parseInt(String(max)), 10),
+        apikey: apiKey,
+      };
+    } else {
+      return res.status(400).json({ error: "Either 'q' or 'country' is required" });
+    }
+
+    const response = await fetchWithRetry(url, { params }, 3, 2000);
+
+    // Normalize GNews response to match app's expected format
+    const articles = (response.data.articles || []).map((article: any) => ({
+      id: article.id,
+      title: article.title,
+      description: article.description || "",
+      content: article.content || "",
+      url: article.url,
+      image: article.image || null,
+      publishedAt: article.publishedAt,
+      lang: article.lang,
+      source: {
+        id: article.source?.id || null,
+        name: article.source?.name || "Unknown Source",
+        url: article.source?.url || null,
+        country: article.source?.country || String(country).toLowerCase(),
+      },
+    }));
+
+    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=600");
     res.status(200).json({
-      offset: response.data.offset || parseInt(String(offset)),
-      number: response.data.number || parseInt(String(number)),
-      available: response.data.available || 0,
-      news: response.data.news || [],
+      totalArticles: response.data.totalArticles || 0,
+      articles,
     });
   } catch (error) {
     const axiosError = error as any;
-    console.error("World News API error after retries:", axiosError.message);
+    console.error("GNews API error after retries:", axiosError.message);
     const status = axiosError.response?.status || 500;
     res.status(status).json({
       error: "News API error",

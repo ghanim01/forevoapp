@@ -5,7 +5,7 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<VercelResponse | void> {
-  const { competition, status } = req.query;
+  const { competition, status, limit } = req.query;
 
   if (!competition) {
     return res.status(400).json({ error: "competition is required" });
@@ -18,15 +18,20 @@ export default async function handler(
   }
 
   try {
+    const params: any = {};
+    if (status) params.status = status;
+    if (limit) params.limit = parseInt(String(limit));
+
     const response = await axios.get(
       `https://api.football-data.org/v4/competitions/${String(competition)}/matches`,
       {
         headers: {
           "X-Auth-Token": apiToken,
         },
-        params: status ? { status } : {},
+        params,
       }
     );
+    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=600");
     res.status(200).json(response.data);
   } catch (error) {
     const axiosError = error as any;

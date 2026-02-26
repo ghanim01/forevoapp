@@ -29,6 +29,9 @@ export default async function handler(
         },
       }
     );
+    
+    // Set cache headers for better performance
+    res.setHeader("Cache-Control", "public, max-age=600, s-maxage=600");
     res.status(200).json(response.data);
   } catch (error) {
     const axiosError = error as any;

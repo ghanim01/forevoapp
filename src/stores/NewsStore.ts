@@ -1,42 +1,50 @@
-import { ref } from "vue";
 import { defineStore } from "pinia";
-import cities from "cities.json";
-import _ from "lodash";
 import axios from "axios";
+import type { Article } from "../types";
 
-interface Article {
-  id: number;
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string | null;
-  publishedAt: string;
-  source: { name: string };
-  content: string;
-  author: string | null;
-  authors: string[] | null;
-  language: string;
-  category: string;
-  source_country: string;
-  sentiment: number;
+const CACHE_KEY = "forevo_news_cache";
+const CACHE_DURATION_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+interface NewsCache {
+  articles: Article[];
+  timestamp: number;
 }
 
-interface NewsResponse {
-  news: any[];
+function loadCache(): NewsCache | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const cache: NewsCache = JSON.parse(raw);
+    if (Date.now() - cache.timestamp > CACHE_DURATION_MS) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    return cache;
+  } catch {
+    localStorage.removeItem(CACHE_KEY);
+    return null;
+  }
 }
 
-interface CityData {
-  name: string;
-  country: string;
-  lat: string | number;
-  lng: string | number;
+function saveCache(articles: Article[]): void {
+  const cache: NewsCache = { articles, timestamp: Date.now() };
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // Storage full or unavailable – silently ignore
+  }
 }
+
+// GNews search query for Middle East trending news (uses boolean OR)
+const MIDDLE_EAST_QUERY =
+  "Middle East OR Gulf OR Saudi OR UAE OR Egypt OR Lebanon OR Israel OR Jordan OR Iraq OR Syria";
 
 export const useNewsStore = defineStore("newsStore", {
   state: () => ({
-    newsSearchResult: ref<Article[]>([]),
-    cityresponseResult: ref<CityData | null>(null),
+    newsSearchResult: [] as Article[],
     isLoading: false,
+    error: null as string | null,
+    _abortController: null as AbortController | null,
   }),
   getters: {
     getNewsResult(): Article[] {
@@ -44,62 +52,65 @@ export const useNewsStore = defineStore("newsStore", {
     },
   },
   actions: {
-    searchCity(city: string) {
-      const z = city.toLocaleLowerCase().trim();
-      const y = z[0].toUpperCase() + z.slice(1);
-      const x = _.findIndex(cities as any[], function (o: any) {
-        return o.name === y;
-      });
-      if (x === -1) {
-        console.error("City not found:", city);
-        return;
-      }
-      this.cityresponseResult = (cities as any[])[x];
-      this.searchNews();
-    },
-    async searchNews() {
-      this.isLoading = true;
-      try {
-        const cityData = this.cityresponseResult as CityData | null;
-        if (!cityData) {
-          console.error("No city selected");
-          this.newsSearchResult = [];
+    /** Load trending Middle East news – serves from cache if fresh (<6 h) */
+    async fetchNews(forceRefresh = false) {
+      // Try cache first
+      if (!forceRefresh) {
+        const cached = loadCache();
+        if (cached) {
+          this.newsSearchResult = cached.articles;
           return;
         }
+      }
 
+      // Cancel any in-flight request
+      if (this._abortController) {
+        this._abortController.abort();
+      }
+      this._abortController = new AbortController();
+      const signal = this._abortController.signal;
+
+      this.isLoading = true;
+      this.error = null;
+
+      try {
+        // Single API call using GNews search endpoint with Middle East keywords
         const response = await axios.get("/api/news", {
           params: {
-            country: cityData.country,
+            q: MIDDLE_EAST_QUERY,
             language: "en",
-            number: 10,
+            max: 10,
           },
+          signal,
         });
 
-        if (!response?.data?.news || !Array.isArray(response.data.news)) {
-          console.warn("No news articles found");
-          this.newsSearchResult = [];
-          return;
-        }
+        const articles = response.data?.articles ?? [];
 
-        this.newsSearchResult = response.data.news.map((article: any) => ({
+        const mapped: Article[] = articles.map((article: any) => ({
           id: article.id,
           title: article.title,
-          description: article.summary || article.text?.substring(0, 200) || "",
+          description: article.description || "",
           url: article.url,
           urlToImage: article.image || null,
-          publishedAt: article.publish_date,
-          source: { name: article.author || "Unknown Source" },
-          content: article.text,
-          author: article.author,
-          authors: article.authors,
-          language: article.language,
-          category: article.category,
-          source_country: article.source_country,
-          sentiment: article.sentiment,
+          publishedAt: article.publishedAt,
+          source: { name: article.source?.name || "Unknown Source" },
+          content: article.content || "",
+          author: article.source?.name || null,
+          authors: null,
+          language: article.lang,
+          category: "",
+          source_country: article.source?.country || "",
+          sentiment: 0,
         }));
-      } catch (error: any) {
-        console.error("News API error:", error?.response?.data || error.message);
-        this.newsSearchResult = [];
+
+        this.newsSearchResult = mapped;
+        saveCache(mapped);
+      } catch (err: any) {
+        if (err.name !== "CanceledError" && err.code !== "ERR_CANCELED") {
+          console.error("News API error:", err?.response?.data || err.message);
+          this.error = "Failed to load news articles. Please try again.";
+          this.newsSearchResult = [];
+        }
       } finally {
         this.isLoading = false;
       }

@@ -1,0 +1,15 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Main Portal Shape (The 'F' base) -->
+    <path
+        d="M25 20C25 17.2386 27.2386 15 30 15H75C77.7614 15 80 17.2386 80 20V30C80 32.7614 77.7614 35 75 35H40V45H65C67.7614 45 70 47.2386 70 50V60C70 62.7614 67.7614 65 65 65H40V85C40 87.7614 37.7614 90 35 90H30C27.2386 90 25 87.7614 25 85V20Z"
+        fill="#2D3436" />
+
+    <!-- Weather Element (Sun/Circle Highlight) -->
+    <circle cx="70" cy="25" r="5" fill="#FABF2C" />
+
+    <!-- Soccer Element (Hexagonal Negative Space in the 'F' arm) -->
+    <path d="M55 50L60 47L65 50V56L60 59L55 56V50Z" fill="white" />
+
+    <!-- News/Flow Detail (Rounded terminal) -->
+    <rect x="25" y="15" width="5" height="75" rx="2.5" fill="#0984E3" />
+</svg>

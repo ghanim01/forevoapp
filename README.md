@@ -31,7 +31,7 @@
 ## API's Used
 
 - [Football-data.org](https://www.football-data.org/)
-- [World News API](https://worldnewsapi.com/) - Supports 210+ countries & 86+ languages
+- [GNews API](https://gnews.io/) - 80K+ sources, 71 countries, 100 requests/day free tier
 - [OpenWeather](https://openweathermap.org/)
 - [Cities.JSON](https://github.com/lutangar/cities.json)
 
@@ -55,7 +55,7 @@ Create a `.env` file in the project root with the following variables:
 
 ```
 VITE_APP_ID=your_openweather_api_key
-VITE_WORLD_NEWS_API_KEY=your_world_news_api_key
+VITE_GNEWS_API_KEY=your_gnews_api_key
 VITE_SOCCER_TOKEN=your_football_data_token
 VITE_VERCEL_ENV=production
 ```
@@ -63,10 +63,10 @@ VITE_VERCEL_ENV=production
 **Get your API keys:**
 
 - OpenWeather: https://openweathermap.org/api
-- World News API: https://worldnewsapi.com/console/ (Free tier: 1,550 requests/month, supports 210+ countries)
+- GNews: https://gnews.io/register (Free tier: 100 requests/day, 10 articles/request, 80K+ sources)
 - Football-Data.org: https://www.football-data.org/client/register
 
-**For Vercel deployment:** Add the same environment variables (`VITE_APP_ID`, `VITE_WORLD_NEWS_API_KEY`, `VITE_SOCCER_TOKEN`, `VITE_VERCEL_ENV`) in your Vercel project settings under **Environment Variables**.
+**For Vercel deployment:** Add the same environment variables (`VITE_APP_ID`, `VITE_GNEWS_API_KEY`, `VITE_SOCCER_TOKEN`, `VITE_VERCEL_ENV`) in your Vercel project settings under **Environment Variables**.
 
 #### - Install Vercel CLI globally (required for local development)
 
