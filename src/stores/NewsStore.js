@@ -35,7 +35,7 @@ export const useNewsStore = defineStore("newsStore", {
       try {
         let response = await axios.get("/api/news", {
           params: {
-            country: this.cityresponseResult.country,
+            country: this.cityresponseResult.country.toLowerCase(),
           },
         });
         this.newsSearchResult = response.data.articles;
