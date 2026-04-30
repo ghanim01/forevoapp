@@ -37,63 +37,102 @@ npm run test:unit     # Vitest unit tests with jsdom
 ## Code Patterns
 
 ### Pinia Stores (`src/stores/`)
-Stores use Options API style with typed interfaces. City lookups use `cities.json`:
+Stores are defined with the Options API inside `defineStore` and strongly typed using shared interfaces from `src/types/index.ts`.
+- All stores expose getters for read-only access and actions that mutate state and perform API calls via axios.
+- State often includes a private `_abortController` so requests can be cancelled when a user initiates a new search.
 
-```typescript
-// Pattern: City search → set store state → trigger API call
-searchCityName(city: string) {
-  const x = _.findIndex(cities as any[], (o) => o.name === capitalizedCity);
-  this.selectedCity = cities[x];  // Store city data with lat/lng
-  this.searchWeather();           // Trigger API call
+**Weather store** adds robust retry/backoff and abort behavior:
+```ts
+// cancel previous flight before starting
+if (this._abortController) this._abortController.abort();
+this._abortController = new AbortController();
+const signal = this._abortController.signal;
+
+// retry loop with exponential backoff (1s,2s,4s)
+for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  try { /* axios.get('/api/weather', { params, timeout:8000, signal }) */ }
+  catch(err){ /* handle CanceledError specially; else wait and retry */ }
 }
 ```
 
-### Store State Naming
-- `selectedCity` - Current city selection (shared pattern across stores)
-- `weatherResult` / `newsSearchResult` / `soccerResults` - API response data
-- `isLoading` / `loading` - Loading state flags
+**News store** adds local‑storage caching and in‑flight cancellation. Trending articles are cached for 6 hours by default; `fetchNews(true)` forces a refresh.
+
+**Soccer store** duplicates logic for multiple competitions (Premier League, Champions League, La Liga) and provides `filterByLatestMatchday()` helper so views only show the most recent round.
+
+### Search / UI wiring
+The `<AppHeader.vue>` component contains the city search box and quick‑city buttons. It imports `cities.json` and performs in‑memory filtering to provide suggestions (search term length &gt;=2) and populates `selectedCity`:
+```ts
+const filteredCities = computed(() => { /* regex over cities.json */ });
+
+const selectCity = city => {
+  weatherStore.searchCityByObject(city);
+};
+```
+A watcher on `weatherStore.isLoading` clears the input once a search finishes. On mount the header triggers initial data loads for weather and all soccer competitions.
+
+### Store state conventions
+- `selectedCity` – current search target (weather store only)
+- API results: `weatherResult`, `newsSearchResult`, `soccerResults`, etc.
+- Loading flags are either `isLoading` or `loading`; clear them in `finally` blocks.
+- `error` strings are set on failure and reset at start of actions.
 
 ### Serverless API Functions (`api/`)
-All functions follow this pattern:
-1. Extract query params from `req.query`
-2. Validate required params, return 400 if missing
-3. Get API key from `process.env` (supports both `VITE_*` and alternate names)
-4. Call external API with axios
-5. Return response or error status
+All endpoints are plain TypeScript under `api/` and use `@vercel/node`.
+1. Extract and validate `req.query` params; return `400` when required fields are missing.
+2. Resolve API key via `process.env.VITE_*` or fallback name (e.g. `VITE_APP_ID || OPENWEATHER_API_KEY`).
+3. Use axios to call the external service, forward any query parameters, and return the JSON result or an error status.
 
-```typescript
-// api/weather.ts pattern
+Example snippet from `api/weather.ts`:
+```ts
 const apiKey = process.env.VITE_APP_ID || process.env.OPENWEATHER_API_KEY;
 if (!apiKey) return res.status(500).json({ error: "API key not configured" });
 ```
 
-### Component Structure
-Components use `<script setup lang="ts">` with Composition API. Access stores via composables:
-
-```typescript
-const weatherStore = useWeatherStore();
-const searchRes = computed(() => weatherStore.getSearchInput);
-```
+### Component structure
+Components live in `src/components/` and use `<script setup lang="ts">` with Composition API. Stores are accessed via `use*Store()`.
+Views in `src/views/` are simple wrappers for components; only `HomeView.vue` exists currently.
 
 ## Environment Variables
-
-Required in `.env` and Vercel dashboard:
-- `VITE_APP_ID` - OpenWeather API key
-- `VITE_GNEWS_API_KEY` - GNews API key (gnews.io)  
-- `VITE_SOCCER_TOKEN` - Football-data.org token
-- `VITE_VERCEL_ENV` - Set to `production` for Vercel
+Required in `.env` and defined in Vercel dashboard for production:
+- `VITE_APP_ID` (OpenWeather) – also checked via `OPENWEATHER_API_KEY` fallback
+- `VITE_GNEWS_API_KEY` (gnews.io)
+- `VITE_SOCCER_TOKEN` (football-data.org)
+- `VITE_VERCEL_ENV` – set to `production` during deployment
 
 ## External APIs
-
 | Service | Endpoint Proxied | API Function |
 |---------|------------------|--------------|
 | OpenWeather | `/api/weather` | `api/weather.ts` |
-| GNews (gnews.io) | `/api/news` | `api/news.ts` (has retry logic with exponential backoff) |
+| GNews (gnews.io) | `/api/news` | `api/news.ts` (retry + backoff + cache) |
 | Football-Data.org | `/api/soccer` | `api/soccer.ts` |
 
-## File Conventions
+## Build & Development Commands
+```bash
+npm run dev           # Vite dev server only (no serverless)
+npm run dev:vercel    # Vercel dev (proxies /api/* locally)
+vercel dev            # interchangeable with npm run dev:vercel
+npm run build         # production bundle
+npm run preview       # serve built output
+npm run test:unit     # Vitest (jsdom) -- no tests exist yet
+npm run lint          # ESLint fixer
+```
+*Note*: `npm run dev` alone cannot reach `/api/*`; always use `vercel dev` when working with backend endpoints.
 
-- Components: `src/components/*.vue` - PascalCase or camelCase naming
-- Stores: `src/stores/*Store.ts` - Named exports with `use*Store` pattern
-- Views: `src/views/*View.vue` - Page-level components
-- API: `api/*.ts` - Lowercase, matches `/api/*` route
+## Testing
+Vitest is configured but the repository currently has no `.spec.ts` files. Place unit tests under `src/` alongside modules; the command above targets that directory.
+
+## CI/CD
+- Hosted on Vercel; pushes to `main` auto‑deploy.
+- Pull requests trigger preview deployments.
+- Set required env vars in Vercel dashboard.
+
+## File Conventions
+- **components**: `src/components/*.vue` – presentation/UI logic
+- **stores**: `src/stores/*Store.ts` – Pinia state management
+- **views**: `src/views/*View.vue` – page containers
+- **api**: serverless functions matching `/api/*` (lowercase filenames)
+- **types**: shared TypeScript interfaces used across stores/components
+
+> Keep API calls within stores; components should not call external services directly.
+
+
