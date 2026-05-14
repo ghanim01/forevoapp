@@ -51,13 +51,18 @@
 
 #### - Set up environment variables
 
-Create a `.env` file in the project root with the following variables:
+Create a `.env` file in the project root (copy from `.env.example`):
+
+```bash
+cp .env.example .env
+```
+
+Then fill in your API keys in `.env`:
 
 ```
-VITE_APP_ID=your_openweather_api_key
-VITE_GNEWS_API_KEY=your_gnews_api_key
-VITE_SOCCER_TOKEN=your_football_data_token
-VITE_VERCEL_ENV=production
+OPENWEATHER_API_KEY=your_openweather_api_key
+GNEWS_API_KEY=your_gnews_api_key
+SOCCER_API_TOKEN=your_football_data_token
 ```
 
 **Get your API keys:**
@@ -66,7 +71,7 @@ VITE_VERCEL_ENV=production
 - GNews: https://gnews.io/register (Free tier: 100 requests/day, 10 articles/request, 80K+ sources)
 - Football-Data.org: https://www.football-data.org/client/register
 
-**For Vercel deployment:** Add the same environment variables (`VITE_APP_ID`, `VITE_GNEWS_API_KEY`, `VITE_SOCCER_TOKEN`, `VITE_VERCEL_ENV`) in your Vercel project settings under **Environment Variables**.
+**For Vercel deployment:** Add the same environment variables (`OPENWEATHER_API_KEY`, `GNEWS_API_KEY`, `SOCCER_API_TOKEN`) in your Vercel project settings under **Environment Variables**. The legacy `VITE_*` names also work for backward compatibility.
 
 #### - Install Vercel CLI globally (required for local development)
 

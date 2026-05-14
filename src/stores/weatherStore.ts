@@ -1,28 +1,29 @@
 import { defineStore } from "pinia";
-import cities from "cities.json";
-import _ from "lodash";
-import axios from "axios";
+import http from "../api/http";
+import { findCityByName } from "../utils/cities";
 import type { CityData, WeatherData } from "../types";
+
+const DEFAULT_WEATHER: WeatherData = {
+  temp: 0,
+  city: "",
+  windSpeed: "",
+  windDeg: "",
+  humidity: "",
+  clouds: "",
+  xicon: "04n",
+  description: "",
+  feels_like: "",
+  temp_min: "",
+  temp_max: "",
+  date: "",
+  sunrise: "",
+  sunset: "",
+  condition: "",
+};
 
 export const useWeatherStore = defineStore("weatherStore", {
   state: () => ({
-    weatherResult: {
-      temp: 0,
-      city: "",
-      windSpeed: "",
-      windDeg: "",
-      humidity: "",
-      clouds: "",
-      xicon: "04n",
-      description: "",
-      feels_like: "",
-      temp_min: "",
-      temp_max: "",
-      date: "",
-      sunrise: "",
-      sunset: "",
-      condition: "",
-    } as WeatherData,
+    weatherResult: { ...DEFAULT_WEATHER } as WeatherData,
     selectedCity: null as CityData | null,
     isLoading: false,
     error: null as string | null,
@@ -34,24 +35,24 @@ export const useWeatherStore = defineStore("weatherStore", {
     },
   },
   actions: {
-    searchCityName(city: string) {
-      const z = city.toLocaleLowerCase().trim();
-      const y = z[0].toUpperCase() + z.slice(1);
-      const x = _.findIndex(cities as any[], function (o: any) {
-        return o.name === y;
-      });
-      if (x === -1) {
+    async searchCityName(city: string) {
+      const found = await findCityByName(city);
+      if (!found) {
         console.error("City not found:", city);
+        this.error = `City "${city}" not found`;
         return;
       }
-      this.selectedCity = (cities as any[])[x];
-      this.weatherResult.city = (this.selectedCity as CityData).name;
-      this.searchWeather();
+      this.selectedCity = found;
+      this.weatherResult.city = found.name;
+      await this.searchWeather();
     },
     searchCityByObject(city: CityData) {
       this.selectedCity = city;
       this.weatherResult.city = city.name;
       this.searchWeather();
+    },
+    clearError() {
+      this.error = null;
     },
     async searchWeather() {
       // Cancel any in-flight request
@@ -63,7 +64,7 @@ export const useWeatherStore = defineStore("weatherStore", {
 
       this.isLoading = true;
       this.error = null;
-      
+
       try {
         const maxRetries = 3;
         let lastError: any = null;
@@ -76,7 +77,7 @@ export const useWeatherStore = defineStore("weatherStore", {
               return;
             }
 
-            const response = await axios.get("/api/weather", {
+            const response = await http.get("/weather", {
               params: {
                 lat: cityData.lat,
                 lon: cityData.lng,
@@ -105,28 +106,35 @@ export const useWeatherStore = defineStore("weatherStore", {
             this.weatherResult.clouds = response.data.clouds.all;
             this.weatherResult.condition = response.data.weather[0].main;
             this.weatherResult.xicon = response.data.weather[0].icon;
-            this.weatherResult.description = response.data.weather[0].description;
+            this.weatherResult.description =
+              response.data.weather[0].description;
             this.weatherResult.feels_like = response.data.main.feels_like;
             this.weatherResult.temp_max = response.data.main.temp_max;
             this.weatherResult.temp_min = response.data.main.temp_min;
             this.weatherResult.city = response.data.name;
-            
+
             // Success - exit retry loop
             return;
           } catch (err: any) {
             lastError = err;
-            if (err.name === "CanceledError" || err.code === "ERR_CANCELED") {
+            if (
+              err.name === "CanceledError" ||
+              err.code === "ERR_CANCELED"
+            ) {
               // Don't retry if request was canceled
               return;
             }
 
-            console.error(`Weather API error (attempt ${attempt}/${maxRetries}):`, err);
+            console.error(
+              `Weather API error (attempt ${attempt}/${maxRetries}):`,
+              err
+            );
 
             // If this is not the last attempt, wait before retrying
             if (attempt < maxRetries) {
               // Exponential backoff: 1s, 2s, 4s
               const delayMs = Math.pow(2, attempt - 1) * 1000;
-              await new Promise(resolve => setTimeout(resolve, delayMs));
+              await new Promise((resolve) => setTimeout(resolve, delayMs));
             }
           }
         }

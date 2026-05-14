@@ -6,7 +6,7 @@
   </v-app>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { RouterView } from "vue-router";
 </script>
 
@@ -30,7 +30,8 @@ import { RouterView } from "vue-router";
   overflow: hidden;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -46,9 +47,47 @@ html, body {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+}
+
+/* Global focus-visible styles for keyboard accessibility */
+*:focus-visible {
+  outline: 2px solid rgba(34, 211, 238, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Smooth scrolling for overflow containers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(8, 145, 178, 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(8, 145, 178, 0.4);
+}
+
+/* Consistent scrollbar for Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(8, 145, 178, 0.25) transparent;
 }
 </style>

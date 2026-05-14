@@ -10,13 +10,13 @@ export default defineConfig({
     }),
   ],
   build: {
-    chunkSizeWarningLimit: 20000,
+    chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
         manualChunks: {
           vuetify: ["vuetify"],
           vue: ["vue", "vue-router", "pinia"],
-          vendor: ["axios", "lodash", "cities.json"],
+          vendor: ["axios"],
         },
       },
     },

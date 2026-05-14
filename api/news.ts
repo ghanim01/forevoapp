@@ -1,6 +1,12 @@
 import axios from "axios";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
+// Use a clean, non-VITE-prefixed env var for server-side code.
+// Fall back to VITE_GNEWS_API_KEY for backward compatibility.
+function getApiKey(): string | undefined {
+  return process.env.GNEWS_API_KEY || process.env.VITE_GNEWS_API_KEY;
+}
+
 // Retry helper with exponential backoff
 async function fetchWithRetry(
   url: string,
@@ -35,46 +41,66 @@ async function fetchWithRetry(
   throw lastError;
 }
 
+const VALID_LANGUAGES = ["en", "ar", "fr", "de", "es", "zh", "pt", "it", "ru", "ja"];
+const VALID_CATEGORIES = [
+  "general",
+  "world",
+  "nation",
+  "business",
+  "technology",
+  "entertainment",
+  "sports",
+  "science",
+  "health",
+  "top",
+];
+
+function validateLanguage(lang: string): string {
+  const lower = lang.toLowerCase();
+  return VALID_LANGUAGES.includes(lower) ? lower : "en";
+}
+
+function validateCategory(cat: string): string {
+  const lower = cat.toLowerCase();
+  return VALID_CATEGORIES.includes(lower) ? lower : "general";
+}
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
-): Promise<VercelResponse | void> {
+): Promise<void> {
   const { q, country, language = "en", max = 10, category = "general" } = req.query;
 
-  const apiKey = process.env.VITE_GNEWS_API_KEY || process.env.GNEWS_API_KEY;
+  const apiKey = getApiKey();
   if (!apiKey) {
     console.error("GNews API key not configured");
-    return res.status(500).json({ error: "GNews API key not configured" });
+    res.status(500).json({ error: "GNews API key not configured" });
+    return;
   }
 
   try {
     let url: string;
-    let params: Record<string, string | number>;
+    const params: Record<string, string | number> = {};
 
     if (q) {
       // Search endpoint – keyword-based query (supports boolean operators)
-      // Docs: https://docs.gnews.io/endpoints/search-endpoint
       url = "https://gnews.io/api/v4/search";
-      params = {
-        q: String(q),
-        lang: String(language).toLowerCase(),
-        max: Math.min(parseInt(String(max)), 10),
-        sortby: "publishedAt",
-        apikey: apiKey,
-      };
+      params.q = String(q);
+      params.lang = validateLanguage(String(language));
+      params.max = Math.min(parseInt(String(max), 10), 10);
+      params.sortby = "publishedAt";
+      params.apikey = apiKey;
     } else if (country) {
       // Top-headlines endpoint – country-specific trending articles
-      // Docs: https://docs.gnews.io/endpoints/top-headlines-endpoint
       url = "https://gnews.io/api/v4/top-headlines";
-      params = {
-        category: String(category),
-        lang: String(language).toLowerCase(),
-        country: String(country).toLowerCase(),
-        max: Math.min(parseInt(String(max)), 10),
-        apikey: apiKey,
-      };
+      params.category = validateCategory(String(category));
+      params.lang = validateLanguage(String(language));
+      params.country = String(country).toLowerCase();
+      params.max = Math.min(parseInt(String(max), 10), 10);
+      params.apikey = apiKey;
     } else {
-      return res.status(400).json({ error: "Either 'q' or 'country' is required" });
+      res.status(400).json({ error: "Either 'q' or 'country' is required" });
+      return;
     }
 
     const response = await fetchWithRetry(url, { params }, 3, 2000);
@@ -97,7 +123,10 @@ export default async function handler(
       },
     }));
 
-    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300, stale-while-revalidate=600");
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=600"
+    );
     res.status(200).json({
       totalArticles: response.data.totalArticles || 0,
       articles,
