@@ -352,8 +352,8 @@ const formatDuration = (d: string) => {
   align-items: center;
   gap: 0.35rem;
   min-width: 0;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 0.2rem 0.6rem 0.2rem 0.4rem;
 }
@@ -362,12 +362,11 @@ const formatDuration = (d: string) => {
   height: 16px;
   object-fit: contain;
   flex-shrink: 0;
-  opacity: 0.8;
 }
 .comp-name {
   font-size: 0.6rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+  color: #1e293b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
