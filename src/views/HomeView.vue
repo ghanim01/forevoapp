@@ -206,7 +206,7 @@ const switchMobileTab = (tab: string) => {
 
 /* Section-specific sizing + accent borders */
 .section-weather {
-  flex: 0.55;
+  flex: 0.75;
   border-color: rgba(8, 145, 178, 0.15);
 }
 
