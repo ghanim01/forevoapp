@@ -1,9 +1,10 @@
 <template>
-  <div
+  <button
     class="match-card"
     :class="{ 'is-live': isLive, 'is-finished': isFinished }"
     role="article"
     :aria-label="ariaLabel"
+    @click="$emit('select', match)"
   >
     <!-- Live Badge -->
     <div v-if="isLive" class="live-badge">
@@ -56,7 +57,7 @@
         <div class="team-name">{{ match.awayTeam?.shortName || match.awayTeam?.name }}</div>
       </div>
     </div>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -68,6 +69,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+defineEmits<{ select: [match: Match] }>();
 
 const formattedDate = computed(() => {
   const date = new Date(props.match.utcDate);
@@ -139,7 +141,7 @@ const ariaLabel = computed(() => {
   padding: 0.4rem 1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  cursor: default;
+  cursor: pointer;
 }
 
 .match-card:hover {
@@ -151,6 +153,10 @@ const ariaLabel = computed(() => {
   );
   box-shadow: 0 8px 32px rgba(8, 145, 178, 0.12);
   transform: translateY(-1px);
+}
+
+.match-card:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .match-card.is-live {

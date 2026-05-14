@@ -218,11 +218,11 @@ const switchMobileTab = (tab: string) => {
 }
 
 .weather-section {
-  flex: 1.2;
+  flex: 0.75;
 }
 
 .soccer-section {
-  flex: 3;
+  flex: 4;
 }
 
 .news-section {

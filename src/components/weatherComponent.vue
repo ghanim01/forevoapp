@@ -340,7 +340,7 @@ const icon = computed(
     rgba(15, 23, 42, 0.5)
   );
   border-radius: 0;
-  padding: 0.9rem 1.2rem;
+  padding: 0.65rem 1rem;
   backdrop-filter: blur(10px);
   border: none;
   box-shadow: none;
@@ -349,7 +349,7 @@ const icon = computed(
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.4rem;
 }
 
 /* ---------- Loading / Error ---------- */
@@ -472,8 +472,8 @@ const icon = computed(
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
   gap: 0.5rem;
 }
@@ -486,7 +486,7 @@ const icon = computed(
 }
 
 .city-name {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
   margin: 0;
   white-space: nowrap;
@@ -498,8 +498,8 @@ const icon = computed(
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .date-text {
@@ -521,12 +521,12 @@ const icon = computed(
 }
 
 .tab-btn {
-  padding: 0.28rem 0.7rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 20px;
   border: 1px solid rgba(8, 145, 178, 0.2);
   background: rgba(8, 145, 178, 0.05);
   color: rgba(255, 255, 255, 0.55);
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -558,7 +558,7 @@ const icon = computed(
 .weather-body {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   flex: 1;
   min-height: 0;
 }
@@ -575,13 +575,13 @@ const icon = computed(
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
 }
 
 .weather-emoji {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   position: absolute;
   z-index: 1;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
@@ -589,8 +589,8 @@ const icon = computed(
 
 .weather-icon {
   position: absolute;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   transition: opacity 0.4s ease;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
 }
@@ -601,7 +601,7 @@ const icon = computed(
 }
 
 .temperature {
-  font-size: 1.75rem;
+  font-size: 1.55rem;
   font-weight: 700;
   line-height: 1;
   margin: 0;
@@ -609,8 +609,8 @@ const icon = computed(
 }
 
 .description {
-  font-size: 0.7rem;
-  margin: 0.15rem 0 0 0;
+  font-size: 0.65rem;
+  margin: 0.1rem 0 0 0;
   opacity: 0.9;
   text-transform: capitalize;
   white-space: nowrap;
@@ -620,7 +620,7 @@ const icon = computed(
 .stat-pills {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.4rem;
+  gap: 0.3rem;
   flex: 1;
 }
 
@@ -628,7 +628,7 @@ const icon = computed(
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(8, 145, 178, 0.15);
   border-radius: 8px;
-  padding: 0.4rem 0.35rem;
+  padding: 0.3rem 0.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -642,15 +642,15 @@ const icon = computed(
 }
 
 .stat-label {
-  font-size: 0.62rem;
+  font-size: 0.55rem;
   opacity: 0.82;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.1rem;
 }
 
 .stat-value {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 600;
 }
 

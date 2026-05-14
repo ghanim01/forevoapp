@@ -78,7 +78,7 @@
               <p>No matches available</p>
             </div>
             <div v-else class="matches-list">
-              <MatchCard v-for="match in matches" :key="match.id" :match="match" />
+              <MatchCard v-for="match in matches" :key="match.id" :match="match" @select="openMatchDetail" />
             </div>
           </template>
 
@@ -88,7 +88,7 @@
               <p>No matches available</p>
             </div>
             <div v-else class="matches-list">
-              <MatchCard v-for="match in CLmatches" :key="match.id" :match="match" />
+              <MatchCard v-for="match in CLmatches" :key="match.id" :match="match" @select="openMatchDetail" />
             </div>
           </template>
 
@@ -98,12 +98,19 @@
               <p>No matches available</p>
             </div>
             <div v-else class="matches-list">
-              <MatchCard v-for="match in LAmatches" :key="match.id" :match="match" />
+              <MatchCard v-for="match in LAmatches" :key="match.id" :match="match" @select="openMatchDetail" />
             </div>
           </template>
         </div>
       </template>
     </v-card>
+
+    <!-- Match Detail Modal -->
+    <MatchDetailModal
+      :match="selectedMatch"
+      :competition="currentCompetition"
+      @close="closeMatchDetail"
+    />
   </div>
 </template>
 
@@ -111,9 +118,33 @@
 import { computed, ref } from "vue";
 import { useSoccerStore } from "../stores/soccerStore";
 import MatchCard from "./MatchCard.vue";
+import MatchDetailModal from "./MatchDetailModal.vue";
+import type { Match } from "../types";
 
 const soccerStore = useSoccerStore();
 const activeTab = ref("pl");
+
+const selectedMatch = ref<Match | null>(null);
+const showModal = ref(false);
+
+const currentCompetition = computed(() => {
+  if (activeTab.value === "pl") return soccerStore.getSoccerResults.competition;
+  if (activeTab.value === "cl") return soccerStore.getCLResults.competition;
+  if (activeTab.value === "la") return soccerStore.getLAResults.competition;
+  return null;
+});
+
+const openMatchDetail = (match: Match) => {
+  selectedMatch.value = match;
+  showModal.value = true;
+};
+
+const closeMatchDetail = () => {
+  showModal.value = false;
+  setTimeout(() => {
+    selectedMatch.value = null;
+  }, 300);
+};
 
 const loading = computed(() => soccerStore.isLoading);
 
