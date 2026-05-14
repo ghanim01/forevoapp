@@ -123,6 +123,8 @@ import type { Match } from "../types";
 
 const soccerStore = useSoccerStore();
 const activeTab = ref("pl");
+// Track loading per-tab so skeleton shows on tab switch
+const tabLoading = ref<Record<string, boolean>>({ pl: false, cl: false, la: false });
 
 const selectedMatch = ref<Match | null>(null);
 const showModal = ref(false);
@@ -146,14 +148,14 @@ const closeMatchDetail = () => {
   }, 300);
 };
 
-const loading = computed(() => soccerStore.isLoading);
+const loading = computed(() => soccerStore.isLoading || tabLoading.value[activeTab.value]);
 
 const hasNoData = computed(() => {
-  return (
-    matches.value.length === 0 &&
-    CLmatches.value.length === 0 &&
-    LAmatches.value.length === 0
-  );
+  // Per-tab: only check current tab's data
+  if (activeTab.value === "pl") return matches.value.length === 0;
+  if (activeTab.value === "cl") return CLmatches.value.length === 0;
+  if (activeTab.value === "la") return LAmatches.value.length === 0;
+  return true;
 });
 
 const matches = computed(() => {
@@ -178,19 +180,27 @@ const switchTab = (tab: string) => {
   activeTab.value = tab;
   // Lazy fetch if not already loaded
   if (tab === "pl" && soccerStore.getSoccerResults.matches.length === 0) {
-    soccerStore.searchSoccer();
+    tabLoading.value[tab] = true;
+    soccerStore.searchSoccer().finally(() => { tabLoading.value[tab] = false; });
   } else if (tab === "cl" && soccerStore.getCLResults.matches.length === 0) {
-    soccerStore.searchCLMatches();
+    tabLoading.value[tab] = true;
+    soccerStore.searchCLMatches().finally(() => { tabLoading.value[tab] = false; });
   } else if (tab === "la" && soccerStore.getLAResults.matches.length === 0) {
-    soccerStore.searchLAMatches();
+    tabLoading.value[tab] = true;
+    soccerStore.searchLAMatches().finally(() => { tabLoading.value[tab] = false; });
   }
 };
 
 const retryActiveTab = () => {
   soccerStore.clearError(activeTab.value as "pl" | "cl" | "la");
-  if (activeTab.value === "pl") soccerStore.searchSoccer();
-  else if (activeTab.value === "cl") soccerStore.searchCLMatches();
-  else if (activeTab.value === "la") soccerStore.searchLAMatches();
+  tabLoading.value[activeTab.value] = true;
+  if (activeTab.value === "pl") {
+    soccerStore.searchSoccer().finally(() => { tabLoading.value[activeTab.value] = false; });
+  } else if (activeTab.value === "cl") {
+    soccerStore.searchCLMatches().finally(() => { tabLoading.value[activeTab.value] = false; });
+  } else if (activeTab.value === "la") {
+    soccerStore.searchLAMatches().finally(() => { tabLoading.value[activeTab.value] = false; });
+  }
 };
 </script>
 
