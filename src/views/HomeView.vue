@@ -204,29 +204,20 @@ const switchMobileTab = (tab: string) => {
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-/* Section-specific accent borders */
+/* Section-specific sizing + accent borders */
 .section-weather {
+  flex: 0.55;
   border-color: rgba(8, 145, 178, 0.15);
 }
 
 .section-soccer {
+  flex: 5;
   border-color: rgba(34, 197, 94, 0.1);
 }
 
 .section-news {
-  border-color: rgba(168, 85, 247, 0.1);
-}
-
-.weather-section {
-  flex: 0.55;
-}
-
-.soccer-section {
-  flex: 5;
-}
-
-.news-section {
   flex: 1;
+  border-color: rgba(168, 85, 247, 0.1);
 }
 
 /* Tablet Layout */
