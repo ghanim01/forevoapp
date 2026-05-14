@@ -2,115 +2,147 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="match" class="modal-overlay" @click.self="$emit('close')">
-        <div class="modal-container" role="dialog" aria-modal="true" :aria-label="`Match details: ${match.homeTeam?.name} vs ${match.awayTeam?.name}`">
-          <!-- Close button -->
+        <div
+          class="modal-container"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="`Match: ${homeName} vs ${awayName}`"
+        >
+          <!-- Close -->
           <button class="modal-close" @click="$emit('close')" aria-label="Close">
             <v-icon icon="mdi-close" size="small"></v-icon>
           </button>
 
-          <!-- Competition badge -->
-          <div class="competition-badge" v-if="competition">
-            <img v-if="competition.emblem" :src="competition.emblem" :alt="competition.name" class="comp-emblem" />
-            <span class="comp-name">{{ competition.name }}</span>
+          <!-- Competition -->
+          <div class="comp-bar" v-if="competition">
+            <img
+              v-if="competition.emblem"
+              :src="competition.emblem"
+              :alt="competition.name"
+              class="comp-emblem"
+            />
+            <span class="comp-label">{{ competition.name }}</span>
           </div>
 
           <!-- Scoreboard -->
           <div class="scoreboard">
-            <!-- Home Team -->
-            <div class="team-block home">
-              <img v-if="match.homeTeam?.crest" :src="match.homeTeam.crest" :alt="match.homeTeam.name" class="team-crest-large" />
-              <div class="team-details">
-                <span class="team-full-name">{{ match.homeTeam?.name }}</span>
-                <span class="team-short-name">{{ match.homeTeam?.shortName }}</span>
+            <!-- Home -->
+            <div class="team-side home">
+              <img
+                v-if="match.homeTeam?.crest"
+                :src="match.homeTeam.crest"
+                :alt="match.homeTeam.name"
+                class="crest"
+              />
+              <div class="team-info">
+                <div class="team-full">{{ match.homeTeam?.shortName || match.homeTeam?.name }}</div>
+                <div class="team-sub">Home</div>
               </div>
             </div>
 
             <!-- Score -->
-            <div class="score-block">
-              <div class="score-main">
-                <span class="score-home">{{ match.score?.fullTime?.home ?? '-' }}</span>
-                <span class="score-colon" aria-hidden="true">:</span>
-                <span class="score-away">{{ match.score?.fullTime?.away ?? '-' }}</span>
+            <div class="score-middle">
+              <div class="score-digits">
+                <span class="digit">{{ homeScore }}</span>
+                <span class="colon" aria-hidden="true">:</span>
+                <span class="digit">{{ awayScore }}</span>
               </div>
-              <div class="score-meta">
-                <span class="status-pill" :class="`status-${statusClass}`">
-                  <span v-if="isLive" class="live-pip" aria-hidden="true"></span>
-                  {{ statusBadge }}
+              <div class="score-status-row">
+                <span class="match-status" :class="`ms-${statusClass}`">
+                  <span v-if="isLiveStatus" class="live-pip" aria-hidden="true"></span>
+                  {{ statusLabel }}
                 </span>
-                <span class="match-round" v-if="match.matchday">Matchday {{ match.matchday }}</span>
+                <span v-if="match.matchday" class="matchday">MD{{ match.matchday }}</span>
               </div>
-              <div class="score-date">{{ formattedDate }}</div>
+              <div class="score-date">{{ dateTime }}</div>
             </div>
 
-            <!-- Away Team -->
-            <div class="team-block away">
-              <div class="team-details">
-                <span class="team-full-name">{{ match.awayTeam?.name }}</span>
-                <span class="team-short-name">{{ match.awayTeam?.shortName }}</span>
+            <!-- Away -->
+            <div class="team-side away">
+              <div class="team-info">
+                <div class="team-full">{{ match.awayTeam?.shortName || match.awayTeam?.name }}</div>
+                <div class="team-sub">Away</div>
               </div>
-              <img v-if="match.awayTeam?.crest" :src="match.awayTeam.crest" :alt="match.awayTeam.name" class="team-crest-large" />
+              <img
+                v-if="match.awayTeam?.crest"
+                :src="match.awayTeam.crest"
+                :alt="match.awayTeam.name"
+                class="crest"
+              />
             </div>
           </div>
 
-          <!-- Detail Stats Grid -->
+          <!-- Stats -->
           <div class="stats-grid">
-            <div class="stat-card" v-if="match.score?.halfTime?.home !== null && match.score?.halfTime?.away !== null">
-              <div class="stat-icon">
-                <v-icon icon="mdi-clock-time-four" size="small"></v-icon>
-              </div>
-              <div class="stat-body">
-                <span class="stat-label">Half Time</span>
-                <span class="stat-value">{{ match.score.halfTime.home }} : {{ match.score.halfTime.away }}</span>
-              </div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-icon">
-                <v-icon icon="mdi-calendar" size="small"></v-icon>
-              </div>
-              <div class="stat-body">
-                <span class="stat-label">Date</span>
-                <span class="stat-value">{{ fullDate }}</span>
+            <!-- Half Time -->
+            <div class="stat-cell" v-if="hasHalfTime">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-clock-time-four" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Half Time</span>
+                <span class="st-value">{{ match.score.halfTime.homeTeam }} : {{ match.score.halfTime.awayTeam }}</span>
               </div>
             </div>
 
-            <div class="stat-card" v-if="match.stage">
-              <div class="stat-icon">
-                <v-icon icon="mdi-trophy-outline" size="small"></v-icon>
-              </div>
-              <div class="stat-body">
-                <span class="stat-label">Stage</span>
-                <span class="stat-value">{{ match.stage }}</span>
-              </div>
-            </div>
-
-            <div class="stat-card" v-if="match.score?.winner">
-              <div class="stat-icon">
-                <v-icon icon="mdi-crown" size="small"></v-icon>
-              </div>
-              <div class="stat-body">
-                <span class="stat-label">Winner</span>
-                <span class="stat-value winner-text">{{ match.score.winner === 'HOME_TEAM' ? match.homeTeam?.name : match.score.winner === 'AWAY_TEAM' ? match.awayTeam?.name : 'Draw' }}</span>
+            <!-- Full Date -->
+            <div class="stat-cell">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-calendar" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Date</span>
+                <span class="st-value">{{ fullDate }}</span>
               </div>
             </div>
 
-            <div class="stat-card" v-if="match.score?.duration">
-              <div class="stat-icon">
-                <v-icon icon="mdi-clock-outline" size="small"></v-icon>
-              </div>
-              <div class="stat-body">
-                <span class="stat-label">Duration</span>
-                <span class="stat-value">{{ match.score.duration === 'REGULAR' ? 'Regular' : match.score.duration }}</span>
+            <!-- Stage -->
+            <div class="stat-cell" v-if="match.stage && match.stage !== 'REGULAR_SEASON'">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-trophy-outline" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Stage</span>
+                <span class="st-value">{{ formatStage(match.stage) }}</span>
               </div>
             </div>
 
-            <div class="stat-card">
-              <div class="stat-icon">
-                <v-icon icon="mdi-update" size="small"></v-icon>
+            <!-- Winner -->
+            <div class="stat-cell" v-if="match.score?.winner && match.status === 'FINISHED'">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-crown" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Winner</span>
+                <span class="st-value winner-val">{{ winnerName }}</span>
               </div>
-              <div class="stat-body">
-                <span class="stat-label">Last Updated</span>
-                <span class="stat-value">{{ formattedLastUpdated }}</span>
+            </div>
+
+            <!-- Duration -->
+            <div class="stat-cell" v-if="match.score?.duration && match.score.duration !== 'REGULAR'">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-clock-outline" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Duration</span>
+                <span class="st-value">{{ formatDuration(match.score.duration) }}</span>
+              </div>
+            </div>
+
+            <!-- Extra Time -->
+            <div class="stat-cell" v-if="hasExtraTime">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-clock-plus-outline" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Extra Time</span>
+                <span class="st-value">{{ match.score.extraTime!.homeTeam }} : {{ match.score.extraTime!.awayTeam }}</span>
+              </div>
+            </div>
+
+            <!-- Penalties -->
+            <div class="stat-cell" v-if="hasPenalties">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-target" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Penalties</span>
+                <span class="st-value">{{ match.score.penalties!.homeTeam }} : {{ match.score.penalties!.awayTeam }}</span>
+              </div>
+            </div>
+
+            <!-- Updated -->
+            <div class="stat-cell">
+              <div class="stat-icon-wrap"><v-icon icon="mdi-update" size="16" /></div>
+              <div class="stat-text">
+                <span class="st-label">Updated</span>
+                <span class="st-value">{{ updatedTime }}</span>
               </div>
             </div>
           </div>
@@ -124,38 +156,47 @@
 import { computed } from "vue";
 import type { Match, Competition } from "../types";
 
-interface Props {
+const props = defineProps<{
   match: Match | null;
   competition?: Competition | null;
-}
+}>();
 
-defineProps<Props>();
 defineEmits<{ close: [] }>();
 
-const isLive = (match: Match) => {
-  return match.status === "IN_PLAY" || match.status === "LIVE";
-};
+// -- Derived state (computed, not functions) --
 
-const statusBadge = (match: Match) => {
-  const s = match.status;
+const homeName = computed(() => props.match?.homeTeam?.name ?? "");
+const awayName = computed(() => props.match?.awayTeam?.name ?? "");
+
+const homeScore = computed(() => props.match?.score?.fullTime?.homeTeam ?? "-");
+const awayScore = computed(() => props.match?.score?.fullTime?.awayTeam ?? "-");
+
+const isLiveStatus = computed(() => {
+  const s = props.match?.status;
+  return s === "IN_PLAY" || s === "LIVE" || s === "PAUSED";
+});
+
+const statusLabel = computed(() => {
+  const s = props.match?.status;
   if (s === "IN_PLAY" || s === "LIVE") return "LIVE";
   if (s === "FINISHED") return "Full Time";
   if (s === "PAUSED") return "Paused";
   if (s === "TIMED") return "Scheduled";
-  return s;
-};
+  return s ?? "";
+});
 
-const statusClass = (match: Match) => {
-  const s = match.status;
+const statusClass = computed(() => {
+  const s = props.match?.status;
   if (s === "IN_PLAY" || s === "LIVE") return "live";
   if (s === "FINISHED") return "finished";
   if (s === "PAUSED") return "paused";
   if (s === "TIMED") return "scheduled";
-  return s.toLowerCase();
-};
+  return (s ?? "").toLowerCase();
+});
 
-const formattedDate = (match: Match) => {
-  const d = new Date(match.utcDate);
+const dateTime = computed(() => {
+  if (!props.match) return "";
+  const d = new Date(props.match.utcDate);
   return d.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -163,10 +204,11 @@ const formattedDate = (match: Match) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-};
+});
 
-const fullDate = (match: Match) => {
-  const d = new Date(match.utcDate);
+const fullDate = computed(() => {
+  if (!props.match) return "";
+  const d = new Date(props.match.utcDate);
   return d.toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -175,16 +217,54 @@ const fullDate = (match: Match) => {
     hour: "2-digit",
     minute: "2-digit",
   });
+});
+
+const updatedTime = computed(() => {
+  if (!props.match) return "";
+  const d = new Date(props.match.lastUpdated);
+  const now = new Date();
+  const diffH = Math.floor((now.getTime() - d.getTime()) / 3600000);
+  if (diffH < 1) return "Just now";
+  if (diffH < 24) return `${diffH}h ago`;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+});
+
+const hasHalfTime = computed(() => {
+  const ht = props.match?.score?.halfTime;
+  return ht && (ht.homeTeam !== null || ht.awayTeam !== null);
+});
+
+const hasExtraTime = computed(() => {
+  const et = props.match?.score?.extraTime;
+  return et && (et.homeTeam !== null || et.awayTeam !== null);
+});
+
+const hasPenalties = computed(() => {
+  const p = props.match?.score?.penalties;
+  return p && (p.homeTeam !== null || p.awayTeam !== null);
+});
+
+const winnerName = computed(() => {
+  const w = props.match?.score?.winner;
+  if (!w || !props.match) return "";
+  if (w === "HOME_TEAM") return props.match.homeTeam?.shortName || props.match.homeTeam?.name || "Home";
+  if (w === "AWAY_TEAM") return props.match.awayTeam?.shortName || props.match.awayTeam?.name || "Away";
+  return "Draw";
+});
+
+// -- Format helpers (called in template with parentheses) --
+
+const formatStage = (s: string) => {
+  return s
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
-const formattedLastUpdated = (match: Match) => {
-  const d = new Date(match.lastUpdated);
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const formatDuration = (d: string) => {
+  if (d === "REGULAR") return "Regular";
+  if (d === "EXTRA_TIME") return "Extra Time";
+  if (d === "PENALTY_SHOOTOUT") return "Penalties";
+  return d;
 };
 </script>
 
@@ -193,8 +273,8 @@ const formattedLastUpdated = (match: Match) => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,15 +285,15 @@ const formattedLastUpdated = (match: Match) => {
 /* Container */
 .modal-container {
   position: relative;
-  background: linear-gradient(145deg, rgba(10, 16, 40, 0.98), rgba(7, 9, 26, 0.98));
-  border: 1px solid rgba(8, 145, 178, 0.2);
+  background: linear-gradient(160deg, rgba(10, 16, 40, 0.98), rgba(7, 9, 26, 0.98));
+  border: 1px solid rgba(8, 145, 178, 0.18);
   border-radius: 24px;
-  padding: 2rem;
-  max-width: 560px;
+  padding: 1.75rem;
+  max-width: 500px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(8, 145, 178, 0.05);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
   scrollbar-width: thin;
   scrollbar-color: rgba(8, 145, 178, 0.2) transparent;
 }
@@ -221,50 +301,46 @@ const formattedLastUpdated = (match: Match) => {
 /* Close */
 .modal-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 32px;
-  height: 32px;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 1;
+  transition: all 0.2s;
 }
-
 .modal-close:hover {
   background: rgba(255, 255, 255, 0.1);
   color: white;
-  border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Competition */
-.competition-badge {
+/* Competition bar */
+.comp-bar {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-
 .comp-emblem {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
 }
-
-.comp-name {
-  font-size: 0.75rem;
+.comp-label {
+  font-size: 0.7rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.45);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
 }
 
 /* Scoreboard */
@@ -272,11 +348,11 @@ const formattedLastUpdated = (match: Match) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
-.team-block {
+.team-side {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -284,131 +360,132 @@ const formattedLastUpdated = (match: Match) => {
   flex: 1;
   min-width: 0;
 }
-
-.team-block.away {
+.team-side.away {
   text-align: right;
 }
 
-.team-crest-large {
-  width: 64px;
-  height: 64px;
+.crest {
+  width: 56px;
+  height: 56px;
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
 
-.team-details {
+.team-info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
-
-.team-block.away .team-details {
+.team-side.away .team-info {
   align-items: flex-end;
 }
 
-.team-full-name {
-  font-size: 0.85rem;
+.team-full {
+  font-size: 0.82rem;
   font-weight: 700;
   color: white;
   text-align: center;
   line-height: 1.2;
 }
-
-.team-block.away .team-full-name {
+.team-side.away .team-full {
   text-align: right;
 }
 
-.team-short-name {
-  font-size: 0.6rem;
-  color: rgba(255, 255, 255, 0.35);
+.team-sub {
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
-/* Score block */
-.score-block {
+/* Score middle */
+.score-middle {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-shrink: 0;
+  min-width: 90px;
 }
 
-.score-main {
+.score-digits {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
-
-.score-home,
-.score-away {
-  font-size: 2.5rem;
+.digit {
+  font-size: 2.25rem;
   font-weight: 800;
   color: white;
   line-height: 1;
-  min-width: 2.2rem;
+  min-width: 1.8rem;
   text-align: center;
 }
-
-.score-colon {
-  font-size: 2rem;
-  color: rgba(8, 145, 178, 0.4);
+.colon {
+  font-size: 1.75rem;
+  color: rgba(8, 145, 178, 0.35);
+  font-weight: 300;
 }
 
-.score-meta {
+.score-status-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
-.status-pill {
+.match-status {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.65rem;
+  gap: 0.3rem;
+  font-size: 0.6rem;
   font-weight: 700;
-  padding: 0.2rem 0.5rem;
-  border-radius: 8px;
-  letter-spacing: 0.5px;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  letter-spacing: 0.4px;
   text-transform: uppercase;
 }
-
 .live-pip {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: currentColor;
   animation: pulse 1.5s infinite;
 }
-
-.status-live {
+.ms-live {
   background: rgba(239, 68, 68, 0.15);
   color: #fca5a5;
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
-
-.status-finished {
+.ms-finished {
   background: rgba(34, 197, 94, 0.12);
   color: #86efac;
   border: 1px solid rgba(34, 197, 94, 0.25);
 }
-
-.status-scheduled {
+.ms-paused {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fde68a;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+.ms-scheduled {
   background: rgba(59, 130, 246, 0.12);
   color: #93c5fd;
   border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
-.match-round {
-  font-size: 0.6rem;
-  color: rgba(255, 255, 255, 0.4);
+.matchday {
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.35);
   font-weight: 500;
+  padding: 0.15rem 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
 }
 
 .score-date {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
 }
 
 @keyframes pulse {
@@ -416,59 +493,54 @@ const formattedLastUpdated = (match: Match) => {
   50% { opacity: 0.5; transform: scale(0.85); }
 }
 
-/* Stats Grid */
+/* Stats grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.stat-card {
+.stat-cell {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(8, 145, 178, 0.08);
-  border-radius: 12px;
-  padding: 0.7rem;
-  transition: background 0.2s;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(8, 145, 178, 0.06);
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
 }
 
-.stat-card:hover {
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.stat-icon {
+.stat-icon-wrap {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(8, 145, 178, 0.1);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(8, 145, 178, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(34, 211, 238, 0.7);
+  color: rgba(34, 211, 238, 0.6);
 }
 
-.stat-body {
+.stat-text {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.05rem;
   min-width: 0;
 }
 
-.stat-label {
-  font-size: 0.58rem;
+.st-label {
+  font-size: 0.55rem;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.35);
   font-weight: 600;
 }
 
-.stat-value {
-  font-size: 0.78rem;
+.st-value {
+  font-size: 0.75rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85);
   white-space: nowrap;
@@ -476,7 +548,7 @@ const formattedLastUpdated = (match: Match) => {
   text-overflow: ellipsis;
 }
 
-.winner-text {
+.winner-val {
   color: #86efac;
 }
 
@@ -484,61 +556,29 @@ const formattedLastUpdated = (match: Match) => {
 .modal-enter-active {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .modal-leave-active {
   transition: all 0.2s ease;
 }
-
-.modal-enter-from {
-  opacity: 0;
-}
-
-.modal-enter-from .modal-container {
-  transform: scale(0.92) translateY(20px);
-  opacity: 0;
-}
-
+.modal-enter-from,
 .modal-leave-to {
   opacity: 0;
 }
-
+.modal-enter-from .modal-container {
+  transform: scale(0.92) translateY(16px);
+}
 .modal-leave-to .modal-container {
   transform: scale(0.95);
-  opacity: 0;
 }
 
-/* Responsive */
+/* Mobile */
 @media (max-width: 640px) {
-  .modal-container {
-    padding: 1.5rem;
-    border-radius: 20px;
-  }
-
-  .team-crest-large {
-    width: 48px;
-    height: 48px;
-  }
-
-  .score-home,
-  .score-away {
-    font-size: 2rem;
-    min-width: 1.8rem;
-  }
-
-  .score-colon {
-    font-size: 1.6rem;
-  }
-
-  .scoreboard {
-    gap: 1rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .team-full-name {
-    font-size: 0.78rem;
-  }
+  .modal-container { padding: 1.25rem; border-radius: 18px; }
+  .crest { width: 44px; height: 44px; }
+  .digit { font-size: 1.8rem; min-width: 1.5rem; }
+  .colon { font-size: 1.4rem; }
+  .score-middle { min-width: 70px; }
+  .scoreboard { gap: 0.75rem; }
+  .team-full { font-size: 0.75rem; }
+  .stats-grid { grid-template-columns: 1fr; }
 }
 </style>

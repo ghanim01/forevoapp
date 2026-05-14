@@ -340,7 +340,7 @@ const icon = computed(
     rgba(15, 23, 42, 0.5)
   );
   border-radius: 0;
-  padding: 0.65rem 1rem;
+  padding: 0.5rem 0.85rem;
   backdrop-filter: blur(10px);
   border: none;
   box-shadow: none;
@@ -349,7 +349,7 @@ const icon = computed(
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem;
 }
 
 /* ---------- Loading / Error ---------- */
@@ -472,8 +472,8 @@ const icon = computed(
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
   gap: 0.5rem;
 }
@@ -486,7 +486,7 @@ const icon = computed(
 }
 
 .city-name {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 700;
   margin: 0;
   white-space: nowrap;
@@ -497,9 +497,9 @@ const icon = computed(
 .header-meta {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.6);
+  gap: 0.25rem;
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .date-text {
@@ -521,12 +521,12 @@ const icon = computed(
 }
 
 .tab-btn {
-  padding: 0.2rem 0.55rem;
+  padding: 0.15rem 0.45rem;
   border-radius: 20px;
   border: 1px solid rgba(8, 145, 178, 0.2);
   background: rgba(8, 145, 178, 0.05);
   color: rgba(255, 255, 255, 0.55);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -558,7 +558,7 @@ const icon = computed(
 .weather-body {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   flex: 1;
   min-height: 0;
 }
@@ -575,13 +575,13 @@ const icon = computed(
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
 }
 
 .weather-emoji {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   position: absolute;
   z-index: 1;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
@@ -589,8 +589,8 @@ const icon = computed(
 
 .weather-icon {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   transition: opacity 0.4s ease;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
 }
@@ -601,7 +601,7 @@ const icon = computed(
 }
 
 .temperature {
-  font-size: 1.55rem;
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1;
   margin: 0;
@@ -609,8 +609,8 @@ const icon = computed(
 }
 
 .description {
-  font-size: 0.65rem;
-  margin: 0.1rem 0 0 0;
+  font-size: 0.6rem;
+  margin: 0.05rem 0 0 0;
   opacity: 0.9;
   text-transform: capitalize;
   white-space: nowrap;
@@ -620,15 +620,15 @@ const icon = computed(
 .stat-pills {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.3rem;
+  gap: 0.25rem;
   flex: 1;
 }
 
 .stat-pill {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(8, 145, 178, 0.15);
-  border-radius: 8px;
-  padding: 0.3rem 0.25rem;
+  border-radius: 6px;
+  padding: 0.2rem 0.2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -642,15 +642,15 @@ const icon = computed(
 }
 
 .stat-label {
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   opacity: 0.82;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-bottom: 0.1rem;
+  letter-spacing: 0.2px;
+  margin-bottom: 0.05rem;
 }
 
 .stat-value {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 600;
 }
 
@@ -658,7 +658,7 @@ const icon = computed(
 .details-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.45rem;
+  gap: 0.3rem;
   flex: 1;
   align-content: start;
   margin: 0;
@@ -667,10 +667,10 @@ const icon = computed(
 .detail-item {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
   background: rgba(255, 255, 255, 0.07);
-  padding: 0.4rem 0.5rem;
-  border-radius: 8px;
+  padding: 0.3rem 0.35rem;
+  border-radius: 6px;
   border: 1px solid rgba(8, 145, 178, 0.1);
   transition: all 0.2s ease;
 }
@@ -681,7 +681,7 @@ const icon = computed(
 }
 
 .detail-icon {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   opacity: 0.8;
   flex-shrink: 0;
 }
@@ -693,15 +693,15 @@ const icon = computed(
 }
 
 .detail-label {
-  font-size: 0.6rem;
+  font-size: 0.52rem;
   opacity: 0.75;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-bottom: 0.08rem;
+  letter-spacing: 0.2px;
+  margin-bottom: 0.05rem;
 }
 
 .detail-value {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;

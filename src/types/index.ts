@@ -54,12 +54,20 @@ export interface MatchScore {
   winner: string;
   duration: string;
   fullTime: {
-    home: number | null;
-    away: number | null;
+    homeTeam: number | null;
+    awayTeam: number | null;
   };
   halfTime: {
-    home: number | null;
-    away: number | null;
+    homeTeam: number | null;
+    awayTeam: number | null;
+  };
+  extraTime?: {
+    homeTeam: number | null;
+    awayTeam: number | null;
+  };
+  penalties?: {
+    homeTeam: number | null;
+    awayTeam: number | null;
   };
 }
 
