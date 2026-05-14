@@ -1,8 +1,6 @@
 <div align="center">
   <img src="./src/assets/forevoLogo.svg" alt="Forevo" width="180" />
 
-  <h1>Forevo</h1>
-
   <p><strong>Weather · Soccer · News — one dashboard</strong></p>
 
   <p>
@@ -15,11 +13,7 @@
     <img src="https://img.shields.io/badge/vuetify-4-1867C0?style=flat-square&logo=vuetify" alt="Vuetify 4" />
   </p>
 
-  <br />
 
-  <img src="./src/assets/screenShot.png" alt="Forevo Dashboard" width="700" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
-
-  <br />
 </div>
 
 ---
