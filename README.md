@@ -1,104 +1,147 @@
-<br/>
-<p align="center">
-  <a href="https://github.com/ghanim01/forevoapp">
-    <img src="./src/assets/forevoLogo.png" alt="Logo" width="200">
-  </a>
+<div align="center">
+  <img src="./src/assets/forevoLogo.png" alt="Forevo" width="180" />
 
-  <h3 align="center">A simple vuejs single page app to get news, weather and soccer results
-</h3>
-</p>
+  <h1>Forevo</h1>
 
-## Demo
+  <p><strong>Weather · Soccer · News — one dashboard</strong></p>
 
-- [Live Demo](https://forevoapp.vercel.app/)
+  <p>
+    <a href="https://forevoapp.vercel.app/" target="_blank">
+      <img src="https://img.shields.io/badge/demo-live-22D3EE?style=flat-square&logo=vercel" alt="Live Demo" />
+    </a>
+    <img src="https://img.shields.io/github/license/ghanim01/forevoapp?style=flat-square&color=22D3EE" alt="MIT License" />
+    <img src="https://img.shields.io/github/last-commit/ghanim01/forevoapp?style=flat-square&color=6B21A8" alt="Last Commit" />
+    <img src="https://img.shields.io/badge/vue-3-4FC08D?style=flat-square&logo=vue.js" alt="Vue 3" />
+    <img src="https://img.shields.io/badge/vuetify-4-1867C0?style=flat-square&logo=vuetify" alt="Vuetify 4" />
+  </p>
 
-<br />
+  <br />
 
-## Screenshot
+  <img src="./src/assets/screenShot.png" alt="Forevo Dashboard" width="700" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
 
-![](./src/assets/screenShot.png)
+  <br />
+</div>
 
-<br />
+---
 
-## Tech Stack
+## ✨ Overview
 
-- [Vue.js 3](https://vuejs.org/)
-- [Vuetify 3.0](https://next.vuetifyjs.com/en/)
-- [Vite](https://vitejs.dev/)
-- [Pinia](https://pinia.vuejs.org/)
-- [Vue Router](https://router.vuejs.org/)
+**Forevo** is a real-time dashboard that brings together **live weather**, **soccer scores**, and **regional news** in a sleek, dark-themed interface.
 
-## API's Used
+Three data sources, one clean view — built with Vue 3, powered by Vercel serverless functions, and designed for both desktop and mobile.
 
-- [Football-data.org](https://www.football-data.org/)
-- [GNews API](https://gnews.io/) - 80K+ sources, 71 countries, 100 requests/day free tier
-- [OpenWeather](https://openweathermap.org/)
-- [Cities.JSON](https://github.com/lutangar/cities.json)
+---
 
-## Installation and Build
+## 🚀 Features
 
-#### - Clone the repo
+| | |
+|---|---|
+| 🌤️ **Live Weather** | Temperature, humidity, wind, sunrise/sunset — with dynamic gradient backgrounds based on conditions. Search any city or pick from quick-select chips. |
+| ⚽ **Soccer Scores** | Premier League, Champions League, and La Liga latest matchday results. Filter between competitions with live status badges. |
+| 📰 **Regional News** | Middle East headlines via GNews API with smart caching (6-hour localStorage), background refresh, and manual refresh control. |
+| 📱 **Responsive** | Three layouts — desktop (two-column), tablet (stacked), mobile (bottom-tab carousel with animated transitions). |
+| 🌙 **Dark Mode** | Full dark theme with glassmorphism cards, ambient glow orbs, and temperature-aware weather gradients. |
+| 🔒 **API Key Security** | All third-party API calls go through Vercel serverless functions — keys never reach the client. |
 
-```sh
-    git clone https://github.com/ghanim01/forevoapp.git
-```
+---
 
-#### - Install NPM packages
+## 🛠️ Tech Stack
 
-```sh
-    npm install
-```
+<div align="center">
 
-#### - Set up environment variables
+`Vue 3` · `Vuetify 4` · `Pinia` · `Vue Router` · `TypeScript` · `Vite` · `Axios` · `Vercel`
 
-Create a `.env` file in the project root (copy from `.env.example`):
+</div>
+
+| **Frontend** | **Backend** | **APIs** |
+|---|---|---|
+| [Vue 3](https://vuejs.org/) + Composition API | [Vercel Serverless Functions](https://vercel.com/docs/functions) | [OpenWeather](https://openweathermap.org/) |
+| [Vuetify 4](https://vuetifyjs.com/) (dark theme) | Node.js + TypeScript | [Football-Data.org](https://www.football-data.org/) |
+| [Pinia](https://pinia.vuejs.org/) state management | API gateway pattern (keys stay server-side) | [GNews](https://gnews.io/) |
+| [Vue Router](https://router.vuejs.org/) (hash-free) | Retry with exponential backoff | — |
+| [Vite](https://vitejs.dev/) (blazing fast builds) | Response caching via `Cache-Control` headers | — |
+
+---
+
+## ⚡ Quick Start
 
 ```bash
+# 1. Clone
+git clone https://github.com/ghanim01/forevoapp.git && cd forevoapp
+
+# 2. Install
+npm install
+
+# 3. Get API keys from:
+#    • https://openweathermap.org/api
+#    • https://gnews.io/register
+#    • https://www.football-data.org/client/register
+
+# 4. Set environment variables
 cp .env.example .env
+# Then edit .env with your keys
+
+# 5. Install Vercel CLI (for local API proxy)
+npm install -g vercel
+
+# 6. Run (starts Vite + serverless functions)
+npm run dev
 ```
 
-Then fill in your API keys in `.env`:
+> **Note:** The `vercel dev` command automatically proxies `/api/*` requests to your local serverless functions, keeping API keys secure during development.
 
-```
-OPENWEATHER_API_KEY=your_openweather_api_key
-GNEWS_API_KEY=your_gnews_api_key
-SOCCER_API_TOKEN=your_football_data_token
-```
+### Production Build
 
-**Get your API keys:**
-
-- OpenWeather: https://openweathermap.org/api
-- GNews: https://gnews.io/register (Free tier: 100 requests/day, 10 articles/request, 80K+ sources)
-- Football-Data.org: https://www.football-data.org/client/register
-
-**For Vercel deployment:** Add the same environment variables (`OPENWEATHER_API_KEY`, `GNEWS_API_KEY`, `SOCCER_API_TOKEN`) in your Vercel project settings under **Environment Variables**. The legacy `VITE_*` names also work for backward compatibility.
-
-#### - Install Vercel CLI globally (required for local development)
-
-```sh
-    npm install -g vercel
+```bash
+npm run build   # outputs to dist/
 ```
 
-#### - Run project for development
+### Vercel Deployment
 
-```sh
-    npm run dev
+Add these environment variables in your Vercel project settings:
+
+```
+OPENWEATHER_API_KEY
+GNEWS_API_KEY
+SOCCER_API_TOKEN
 ```
 
-This runs `vercel dev` which starts the Vite dev server and the serverless API functions locally.
+---
 
-> **Note:** The `vercel dev` command automatically proxies `/api/*` requests to your local serverless functions, so you can test the full application locally with API key security.
+## 🏗️ Project Structure
 
-#### - Build the project
+```
+src/
+├── api/            # Shared Axios instance
+├── components/     # UI components (Weather, Soccer, News, Header, MatchCard)
+├── composables/    # Reusable Vue composables (useBreakpoint)
+├── stores/         # Pinia stores (weather, soccer, news)
+├── utils/          # Utilities (lazy-loaded cities search)
+├── views/          # Page views (HomeView)
+├── types/          # TypeScript interfaces
+├── plugins/        # Vuetify config
+├── router/         # Vue Router setup
+└── App.vue         # Root component
 
-```sh
-    npm run build
+api/                # Vercel serverless functions (weather, soccer, news)
 ```
 
-## Authors
+---
 
-- [Ahmed Ghanem](https://github.com/ghanim01/)
+## 📊 Architecture Highlights
 
-## License
+| Pattern | Implementation |
+|---|---|
+| **API Gateway** | All external calls proxied through Vercel serverless functions — keys stay server-side |
+| **Smart Caching** | News articles cached in `localStorage` for 6h with 2h background refresh |
+| **Lazy Loading** | `cities.json` (69MB) dynamically imported only on user search |
+| **Error Isolation** | Per-competition error states for soccer (PL/CL/La Liga don't interfere) |
+| **Retry Logic** | Exponential backoff (1s → 2s → 4s) for transient API failures |
+| **Abort Control** | `AbortController` cancels stale requests on rapid city switching |
+| **Code Splitting** | Manual Vite chunks separate Vuetify, Vue core, and vendor libs |
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+---
+
+<div align="center">
+  <sub>Built by <a href="https://github.com/ghanim01">Ahmed Ghanem</a> · MIT License · 2025</sub>
+</div>
