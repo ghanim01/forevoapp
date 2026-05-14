@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./src/assets/forevoLogo.png" alt="Forevo" width="180" />
+  <img src="./src/assets/forevoLogo.svg" alt="Forevo" width="180" />
 
   <h1>Forevo</h1>
 
