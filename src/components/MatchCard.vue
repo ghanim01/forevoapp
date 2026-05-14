@@ -29,9 +29,9 @@
       <!-- Score -->
       <div class="score-section">
         <div class="score-display">
-          <span class="score-num home-score">{{ match.score?.fullTime?.homeTeam ?? '-' }}</span>
+          <span class="score-num home-score">{{ match.score?.fullTime?.home ?? '-' }}</span>
           <span class="score-divider" aria-hidden="true">:</span>
-          <span class="score-num away-score">{{ match.score?.fullTime?.awayTeam ?? '-' }}</span>
+          <span class="score-num away-score">{{ match.score?.fullTime?.away ?? '-' }}</span>
         </div>
         <div class="match-meta">
           <span

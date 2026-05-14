@@ -77,7 +77,7 @@
               <div class="tile-icon box-amber"><v-icon icon="mdi-clock-time-four" size="15" /></div>
               <div class="tile-body">
                 <span class="tile-label">Half Time</span>
-                <span class="tile-value">{{ match.score.halfTime.homeTeam }} : {{ match.score.halfTime.awayTeam }}</span>
+                <span class="tile-value">{{ match.score.halfTime.home }} : {{ match.score.halfTime.away }}</span>
               </div>
             </div>
 
@@ -122,7 +122,7 @@
               <div class="tile-icon box-orange"><v-icon icon="mdi-clock-plus-outline" size="15" /></div>
               <div class="tile-body">
                 <span class="tile-label">Extra Time</span>
-                <span class="tile-value">{{ match.score.extraTime!.homeTeam }} : {{ match.score.extraTime!.awayTeam }}</span>
+                <span class="tile-value">{{ match.score.extraTime!.home }} : {{ match.score.extraTime!.away }}</span>
               </div>
             </div>
 
@@ -131,7 +131,7 @@
               <div class="tile-icon box-rose"><v-icon icon="mdi-target" size="15" /></div>
               <div class="tile-body">
                 <span class="tile-label">Penalties</span>
-                <span class="tile-value">{{ match.score.penalties!.homeTeam }} : {{ match.score.penalties!.awayTeam }}</span>
+                <span class="tile-value">{{ match.score.penalties!.home }} : {{ match.score.penalties!.away }}</span>
               </div>
             </div>
 
@@ -170,8 +170,8 @@ defineEmits<{ close: [] }>();
 
 const homeName = computed(() => props.match?.homeTeam?.name ?? "");
 const awayName = computed(() => props.match?.awayTeam?.name ?? "");
-const homeScore = computed(() => props.match?.score?.fullTime?.homeTeam ?? "-");
-const awayScore = computed(() => props.match?.score?.fullTime?.awayTeam ?? "-");
+const homeScore = computed(() => props.match?.score?.fullTime?.home ?? "-");
+const awayScore = computed(() => props.match?.score?.fullTime?.away ?? "-");
 
 const isLiveStatus = computed(() => {
   const s = props.match?.status;
@@ -230,17 +230,17 @@ const updatedTime = computed(() => {
 
 const hasHalfTime = computed(() => {
   const ht = props.match?.score?.halfTime;
-  return ht && (ht.homeTeam !== null || ht.awayTeam !== null);
+  return ht && (ht.home !== null || ht.away !== null);
 });
 
 const hasExtraTime = computed(() => {
   const et = props.match?.score?.extraTime;
-  return et && (et.homeTeam !== null || et.awayTeam !== null);
+  return et && (et.home !== null || et.away !== null);
 });
 
 const hasPenalties = computed(() => {
   const p = props.match?.score?.penalties;
-  return p && (p.homeTeam !== null || p.awayTeam !== null);
+  return p && (p.home !== null || p.away !== null);
 });
 
 const hasAnyStat = computed(() => {
