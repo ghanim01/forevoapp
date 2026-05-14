@@ -264,8 +264,8 @@ const formatDuration = (d: string) => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,14 +316,16 @@ const formatDuration = (d: string) => {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  border: none;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(7, 9, 26, 0.85);
+  backdrop-filter: blur(4px);
+  color: rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 .btn-close:hover {
   background: rgba(255, 255, 255, 0.12);
@@ -338,7 +340,7 @@ const formatDuration = (d: string) => {
    4. HERO AREA
    ============================ */
 .hero-area {
-  padding: 1.5rem 1.5rem 0;
+  padding: 1.5rem 3rem 0 1.5rem;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -670,7 +672,7 @@ const formatDuration = (d: string) => {
     border-radius: 16px 16px 0 0;
     max-height: 85vh;
   }
-  .hero-area { padding: 1.25rem 1.25rem 0; }
+  .hero-area { padding: 1.25rem 2.75rem 0 1.25rem; }
   .scoreboard { padding: 1rem 1.25rem; gap: 0.75rem; }
   .team-crest { width: 40px; height: 40px; }
   .team-label { font-size: 0.7rem; }
